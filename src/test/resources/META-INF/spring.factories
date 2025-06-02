@@ -1,0 +1,2 @@
+org.springframework.test.context.ContextCustomizerFactory = \
+    com.parcial2.consul.config.SqlTestContainersSpringContextCustomizerFactory

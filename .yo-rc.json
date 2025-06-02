@@ -1,0 +1,33 @@
+{
+  "generator-jhipster": {
+    "applicationType": "monolith",
+    "authenticationType": "jwt",
+    "baseName": "Parcial2sw2M",
+    "buildTool": "maven",
+    "cacheProvider": "no",
+    "clientFramework": "angular",
+    "clientTestFrameworks": [],
+    "clientTheme": "none",
+    "creationTimestamp": 1748873812444,
+    "databaseType": "sql",
+    "devDatabaseType": "postgresql",
+    "enableHibernateCache": null,
+    "enableTranslation": true,
+    "entities": [],
+    "feignClient": null,
+    "jhipsterVersion": "8.11.0",
+    "jwtSecretKey": "Zjc5NWJjNzZhMDIwY2JkMzdlNTcwYTg1NDQ1M2ZjYjY3YmYxZDVmY2NkYWIxY2I4ZjVkZTFlZGNiYWFjZjgzNmJhZDIyMjFlYzZhZWRiMDhmM2IxYTNkZGNjNDAxODJmMDlkYzkwMGZmMjVmMzNhNzhjODYwMDkzMWRmMjM1NTg=",
+    "languages": ["es", "en"],
+    "microfrontend": null,
+    "microfrontends": [],
+    "nativeLanguage": "es",
+    "packageName": "com.parcial2.consul",
+    "prodDatabaseType": "postgresql",
+    "reactive": false,
+    "serverPort": null,
+    "serviceDiscoveryType": null,
+    "syncUserWithIdp": null,
+    "testFrameworks": [],
+    "withAdminUi": true
+  }
+}
