@@ -16,6 +16,15 @@ const routes: Routes = [
     loadComponent: () => import('./layouts/navbar/navbar.component'),
     outlet: 'navbar',
   },
+  // Agregar rutas para GraphQL y GraphiQL
+  {
+    path: 'graphql',
+    children: [], // Ruta vacía para que Angular no interfiera
+  },
+  {
+    path: 'graphiql',
+    children: [], // Ruta vacía para que Angular no interfiera
+  },
   {
     path: 'admin',
     data: {

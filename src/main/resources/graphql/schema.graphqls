@@ -1,0 +1,38 @@
+type User {
+    id: ID
+    login: String!
+    firstName: String
+    lastName: String
+    email: String!
+    imageUrl: String
+    activated: Boolean!
+    langKey: String
+    authorities: [String!]
+    createdBy: String
+    createdDate: String
+    lastModifiedBy: String
+    lastModifiedDate: String
+}
+
+input UserInput {
+    id: ID
+    login: String!
+    firstName: String
+    lastName: String
+    email: String!
+    imageUrl: String
+    activated: Boolean
+    langKey: String
+    authorities: [String!]
+}
+
+type Query {
+    getUserByLogin(login: String!): User
+    getAllUsers(page: Int, size: Int): [User!]!
+}
+
+type Mutation {
+    updateUser(userInput: UserInput!): User
+    createUser(userInput: UserInput!): User
+    deleteUser(login: String!): Boolean
+}

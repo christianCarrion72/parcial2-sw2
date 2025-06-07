@@ -90,6 +90,8 @@ public class WebConfigurer implements ServletContextInitializer, WebServerFactor
             source.registerCorsConfiguration("/management/**", config);
             source.registerCorsConfiguration("/v3/api-docs", config);
             source.registerCorsConfiguration("/swagger-ui/**", config);
+            source.registerCorsConfiguration("/graphql", config); // Añadir esta línea
+            source.registerCorsConfiguration("/graphiql", config); // Añadir esta línea
         }
         return new CorsFilter(source);
     }

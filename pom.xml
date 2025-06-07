@@ -251,6 +251,17 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
         </dependency>
+        <!-- Spring for GraphQL -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-graphql</artifactId>
+        </dependency>
+        <!-- GraphiQL para pruebas (opcional, pero recomendado) -->
+        <dependency>
+            <groupId>org.springframework.graphql</groupId>
+            <artifactId>spring-graphql-test</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>jdbc</artifactId>
@@ -818,9 +829,9 @@
             </activation>
             <properties>
                 <!-- default Spring profiles -->
-                <liquibase-plugin.password/>
-                <liquibase-plugin.url>jdbc:postgresql://localhost:5432/Parcial2sw2M</liquibase-plugin.url>
-                <liquibase-plugin.username>Parcial2sw2M</liquibase-plugin.username>
+                <liquibase-plugin.password>12345678</liquibase-plugin.password>
+                <liquibase-plugin.url>jdbc:postgresql://localhost:5432/consultorioM</liquibase-plugin.url>
+                <liquibase-plugin.username>postgres</liquibase-plugin.username>
                 <profile.test>test,testdev</profile.test>
                 <spring.profiles.active>dev${profile.tls}${profile.no-liquibase}</spring.profiles.active>
             </properties>
@@ -835,13 +846,13 @@
         <profile>
             <id>docker-compose</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <activeByDefault>false</activeByDefault>
             </activation>
             <dependencies>
                 <dependency>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-docker-compose</artifactId>
-                    <optional>true</optional>
+                    <optional>false</optional>
                 </dependency>
             </dependencies>
         </profile>
@@ -939,9 +950,9 @@
             <id>prod</id>
             <properties>
                 <!-- default Spring profiles -->
-                <liquibase-plugin.password/>
-                <liquibase-plugin.url>jdbc:postgresql://localhost:5432/Parcial2sw2M</liquibase-plugin.url>
-                <liquibase-plugin.username>Parcial2sw2M</liquibase-plugin.username>
+                <liquibase-plugin.password>12345678</liquibase-plugin.password>
+                <liquibase-plugin.url>jdbc:postgresql://localhost:5432/consultorioM</liquibase-plugin.url>
+                <liquibase-plugin.username>postgres</liquibase-plugin.username>
                 <profile.test>test,testprod</profile.test>
                 <spring.profiles.active>prod${profile.api-docs}${profile.tls}${profile.e2e}${profile.no-liquibase}</spring.profiles.active>
             </properties>

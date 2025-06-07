@@ -62,6 +62,8 @@ public class SecurityConfiguration {
                     .requestMatchers(mvc.pattern("/app/**")).permitAll()
                     .requestMatchers(mvc.pattern("/i18n/**")).permitAll()
                     .requestMatchers(mvc.pattern("/content/**")).permitAll()
+                    .requestMatchers(mvc.pattern("/graphql")).permitAll() // Permitir acceso al endpoint GraphQL
+                    .requestMatchers(mvc.pattern("/graphiql")).permitAll() // Permitir acceso a GraphiQL (solo en desarrollo)
                     .requestMatchers(mvc.pattern("/swagger-ui/**")).permitAll()
                     .requestMatchers(mvc.pattern(HttpMethod.POST, "/api/authenticate")).permitAll()
                     .requestMatchers(mvc.pattern(HttpMethod.GET, "/api/authenticate")).permitAll()

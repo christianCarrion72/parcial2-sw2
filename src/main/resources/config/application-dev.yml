@@ -32,9 +32,9 @@ spring:
       indent-output: true
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:postgresql://localhost:5432/Parcial2sw2M
-    username: Parcial2sw2M
-    password:
+    url: jdbc:postgresql://localhost:5432/consultorioM
+    username: postgres
+    password: 12345678
     hikari:
       poolName: Hikari
       auto-commit: false
@@ -50,6 +50,13 @@ spring:
     cache-duration: PT1S # 1 second, see the ISO 8601 standard
   thymeleaf:
     cache: false
+  graphql:
+    graphiql:
+      enabled: true
+    schema:
+      printer:
+        enabled: true
+    path: /graphql
 
 server:
   port: 8080
@@ -101,3 +108,4 @@ jhipster:
 # ===================================================================
 
 # application:
+

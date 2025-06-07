@@ -113,6 +113,12 @@
                 </a>
               </li>
             }
+            <li>
+              <a class="dropdown-item" routerLink="/admin/docs" routerLinkActive="active" (click)="collapseNavbar()">
+                <fa-icon icon="book" [fixedWidth]="true"></fa-icon>
+                <span jhiTranslate="global.menu.admin.apidocs">GRAPQL</span>
+              </a>
+            </li>
           </ul>
         </li>
         @if (languages && languages.length > 1) {
