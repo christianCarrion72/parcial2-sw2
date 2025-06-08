@@ -1,0 +1,11 @@
+{
+  "parcial2Sw2MApp": {
+    "EstadoCita": {
+      "null": "",
+      "PROGRAMADA": "PROGRAMADA",
+      "CONFIRMADA": "CONFIRMADA",
+      "CANCELADA": "CANCELADA",
+      "REALIZADA": "REALIZADA"
+    }
+  }
+}

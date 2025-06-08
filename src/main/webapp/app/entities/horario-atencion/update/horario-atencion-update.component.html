@@ -1,0 +1,108 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2
+        id="jhi-horario-atencion-heading"
+        data-cy="HorarioAtencionCreateUpdateHeading"
+        jhiTranslate="parcial2Sw2MApp.horarioAtencion.home.createOrEditLabel"
+      >
+        Crear o editar Horario Atencion
+      </h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id" jhiTranslate="parcial2Sw2MApp.horarioAtencion.id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let diaSemanaRef = editForm.get('diaSemana')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_diaSemana" jhiTranslate="parcial2Sw2MApp.horarioAtencion.diaSemana">Dia Semana</label>
+          <select class="form-control" name="diaSemana" formControlName="diaSemana" id="field_diaSemana" data-cy="diaSemana">
+            <option [ngValue]="null">{{ 'parcial2Sw2MApp.DiaSemana.null' | translate }}</option>
+            @for (diaSemana of diaSemanaValues; track $index) {
+              <option [value]="diaSemana">{{ 'parcial2Sw2MApp.DiaSemana.' + diaSemana | translate }}</option>
+            }
+          </select>
+          @if (diaSemanaRef.invalid && (diaSemanaRef.dirty || diaSemanaRef.touched)) {
+            <div>
+              @if (editForm.get('diaSemana')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Este campo es obligatorio.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let horaInicioRef = editForm.get('horaInicio')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_horaInicio" jhiTranslate="parcial2Sw2MApp.horarioAtencion.horaInicio">Hora Inicio</label>
+          <input
+            type="time"
+            class="form-control"
+            name="horaInicio"
+            id="field_horaInicio"
+            data-cy="horaInicio"
+            formControlName="horaInicio"
+          />
+          @if (horaInicioRef.invalid && (horaInicioRef.dirty || horaInicioRef.touched)) {
+            <div>
+              @if (editForm.get('horaInicio')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Este campo es obligatorio.</small>
+              }
+            </div>
+          }
+        </div>
+
+        @let horaFinRef = editForm.get('horaFin')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_horaFin" jhiTranslate="parcial2Sw2MApp.horarioAtencion.horaFin">Hora Fin</label>
+          <input type="time" class="form-control" name="horaFin" id="field_horaFin" data-cy="horaFin" formControlName="horaFin" />
+          @if (horaFinRef.invalid && (horaFinRef.dirty || horaFinRef.touched)) {
+            <div>
+              @if (editForm.get('horaFin')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Este campo es obligatorio.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_medico" jhiTranslate="parcial2Sw2MApp.horarioAtencion.medico">Medico</label>
+          <select
+            class="form-control"
+            id="field_medico"
+            data-cy="medico"
+            name="medico"
+            formControlName="medico"
+            [compareWith]="compareMedico"
+          >
+            <option [ngValue]="null"></option>
+            @for (medicoOption of medicosSharedCollection; track $index) {
+              <option [ngValue]="medicoOption">{{ medicoOption.matricula }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Cancelar</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Guardar</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

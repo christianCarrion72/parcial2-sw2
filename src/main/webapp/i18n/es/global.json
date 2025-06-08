@@ -8,7 +8,14 @@
       "entities": {
         "main": "Entidades",
         "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)",
-        "adminAuthority": "Authority"
+        "adminAuthority": "Authority",
+        "paciente": "Paciente",
+        "medico": "Medico",
+        "especialidad": "Especialidad",
+        "cita": "Cita",
+        "historiaClinica": "Historia Clinica",
+        "reporte": "Reporte",
+        "horarioAtencion": "Horario Atencion"
       },
       "account": {
         "main": "Cuenta",

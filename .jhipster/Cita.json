@@ -1,0 +1,50 @@
+{
+  "annotations": {
+    "changelogDate": "20250607165814"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "fechaHora",
+      "fieldType": "ZonedDateTime",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "estado",
+      "fieldType": "EstadoCita",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "PROGRAMADA,CONFIRMADA,CANCELADA,REALIZADA"
+    },
+    {
+      "fieldName": "confirmada",
+      "fieldType": "Boolean"
+    }
+  ],
+  "name": "Cita",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityField": "nroHistoriaClinica",
+      "otherEntityName": "paciente",
+      "relationshipName": "paciente",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityField": "matricula",
+      "otherEntityName": "medico",
+      "relationshipName": "medico",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "horarioAtencion",
+      "relationshipName": "horario",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

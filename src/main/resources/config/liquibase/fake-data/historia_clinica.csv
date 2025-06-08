@@ -1,0 +1,12 @@
+id;fecha;sintomas;diagnostico;tratamiento;hash_blockchain
+1;2025-06-06T08:30:00;Fiebre, tos seca, fatiga leve;Gripe estacional;Reposo e hidratación;abc123x
+2;2025-06-06T10:00:00;Dolor abdominal y náuseas;Gastritis aguda;Omeprazol por 7 días;def456y
+3;2025-06-06T11:30:00;Dolor en el pecho al respirar;Costocondritis;Ibuprofeno cada 8h;ghi789z
+4;2025-06-07T09:00:00;Dolor de cabeza y visión borrosa;Migraña;Paracetamol y reposo;xyz123a
+5;2025-06-07T10:00:00;Dolor lumbar intenso;Lumbalgia;Ejercicios de estiramiento y analgésico;jkl456b
+6;2025-06-07T11:00:00;Erupción cutánea en brazos;Dermatitis alérgica;Cremas con corticoides;mno789c
+7;2025-06-07T12:00:00;Pérdida de apetito y fiebre;Infección urinaria;Antibióticos por 5 días;pqr123d
+8;2025-06-07T13:00:00;Palpitaciones frecuentes;Arritmia leve;Control con cardiólogo;stu456e
+9;2025-06-07T14:00:00;Dolor y enrojecimiento ocular;Conjuntivitis;Gotas antibióticas;vwx789f
+10;2025-06-07T15:00:00;Dolor de garganta y fiebre;Amigdalitis;Antibiótico y antitérmico;yz123gh
+

@@ -1,0 +1,31 @@
+{
+  "annotations": {
+    "changelogDate": "20250607165813"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "nombre",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "descripcion",
+      "fieldType": "String"
+    }
+  ],
+  "name": "Especialidad",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "medico",
+      "otherEntityRelationshipName": "especialidades",
+      "relationshipName": "medicos",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-many"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

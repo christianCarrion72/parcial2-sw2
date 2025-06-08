@@ -1,0 +1,13 @@
+{
+  "annotations": {
+    "changelogDate": "20250607165810"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "fields": [],
+  "name": "Authority",
+  "pagination": "pagination",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

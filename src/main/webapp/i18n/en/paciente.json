@@ -1,0 +1,28 @@
+{
+  "parcial2Sw2MApp": {
+    "paciente": {
+      "home": {
+        "title": "Pacientes",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Paciente",
+        "createOrEditLabel": "Create or edit a Paciente",
+        "notFound": "No Pacientes found"
+      },
+      "created": "A new Paciente is created with identifier {{ param }}",
+      "updated": "A Paciente is updated with identifier {{ param }}",
+      "deleted": "A Paciente is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Paciente {{ id }}?"
+      },
+      "detail": {
+        "title": "Paciente"
+      },
+      "id": "ID",
+      "nroHistoriaClinica": "Nro Historia Clinica",
+      "fechaNacimiento": "Fecha Nacimiento",
+      "direccion": "Direccion",
+      "telefono": "Telefono",
+      "user": "User"
+    }
+  }
+}

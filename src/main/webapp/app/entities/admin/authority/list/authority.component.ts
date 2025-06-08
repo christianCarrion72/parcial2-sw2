@@ -1,11 +1,15 @@
 import { Component, NgZone, OnInit, inject, signal } from '@angular/core';
+import { HttpHeaders } from '@angular/common/http';
 import { ActivatedRoute, Data, ParamMap, Router, RouterModule } from '@angular/router';
 import { Observable, Subscription, combineLatest, filter, tap } from 'rxjs';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import SharedModule from 'app/shared/shared.module';
 import { SortByDirective, SortDirective, SortService, type SortState, sortStateSignal } from 'app/shared/sort';
+import { ItemCountComponent } from 'app/shared/pagination';
 import { FormsModule } from '@angular/forms';
+
+import { ITEMS_PER_PAGE, PAGE_HEADER, TOTAL_COUNT_RESPONSE_HEADER } from 'app/config/pagination.constants';
 import { DEFAULT_SORT_DATA, ITEM_DELETED_EVENT, SORT } from 'app/config/navigation.constants';
 import { IAuthority } from '../authority.model';
 import { AuthorityService, EntityArrayResponseType } from '../service/authority.service';
@@ -14,7 +18,7 @@ import { AuthorityDeleteDialogComponent } from '../delete/authority-delete-dialo
 @Component({
   selector: 'jhi-authority',
   templateUrl: './authority.component.html',
-  imports: [RouterModule, FormsModule, SharedModule, SortDirective, SortByDirective],
+  imports: [RouterModule, FormsModule, SharedModule, SortDirective, SortByDirective, ItemCountComponent],
 })
 export class AuthorityComponent implements OnInit {
   subscription: Subscription | null = null;
@@ -22,6 +26,10 @@ export class AuthorityComponent implements OnInit {
   isLoading = false;
 
   sortState = sortStateSignal({});
+
+  itemsPerPage = ITEMS_PER_PAGE;
+  totalItems = 0;
+  page = 1;
 
   public readonly router = inject(Router);
   protected readonly authorityService = inject(AuthorityService);
@@ -36,13 +44,7 @@ export class AuthorityComponent implements OnInit {
     this.subscription = combineLatest([this.activatedRoute.queryParamMap, this.activatedRoute.data])
       .pipe(
         tap(([params, data]) => this.fillComponentAttributeFromRoute(params, data)),
-        tap(() => {
-          if (this.authorities().length === 0) {
-            this.load();
-          } else {
-            this.authorities.set(this.refineData(this.authorities()));
-          }
-        }),
+        tap(() => this.load()),
       )
       .subscribe();
   }
@@ -68,37 +70,50 @@ export class AuthorityComponent implements OnInit {
   }
 
   navigateToWithComponentValues(event: SortState): void {
-    this.handleNavigation(event);
+    this.handleNavigation(this.page, event);
+  }
+
+  navigateToPage(page: number): void {
+    this.handleNavigation(page, this.sortState());
   }
 
   protected fillComponentAttributeFromRoute(params: ParamMap, data: Data): void {
+    const page = params.get(PAGE_HEADER);
+    this.page = +(page ?? 1);
     this.sortState.set(this.sortService.parseSortParam(params.get(SORT) ?? data[DEFAULT_SORT_DATA]));
   }
 
   protected onResponseSuccess(response: EntityArrayResponseType): void {
+    this.fillComponentAttributesFromResponseHeader(response.headers);
     const dataFromBody = this.fillComponentAttributesFromResponseBody(response.body);
-    this.authorities.set(this.refineData(dataFromBody));
-  }
-
-  protected refineData(data: IAuthority[]): IAuthority[] {
-    const { predicate, order } = this.sortState();
-    return predicate && order ? data.sort(this.sortService.startSort({ predicate, order })) : data;
+    this.authorities.set(dataFromBody);
   }
 
   protected fillComponentAttributesFromResponseBody(data: IAuthority[] | null): IAuthority[] {
     return data ?? [];
   }
 
+  protected fillComponentAttributesFromResponseHeader(headers: HttpHeaders): void {
+    this.totalItems = Number(headers.get(TOTAL_COUNT_RESPONSE_HEADER));
+  }
+
   protected queryBackend(): Observable<EntityArrayResponseType> {
+    const { page } = this;
+
     this.isLoading = true;
+    const pageToLoad: number = page;
     const queryObject: any = {
+      page: pageToLoad - 1,
+      size: this.itemsPerPage,
       sort: this.sortService.buildSortParam(this.sortState()),
     };
     return this.authorityService.query(queryObject).pipe(tap(() => (this.isLoading = false)));
   }
 
-  protected handleNavigation(sortState: SortState): void {
+  protected handleNavigation(page: number, sortState: SortState): void {
     const queryParamsObj = {
+      page,
+      size: this.itemsPerPage,
       sort: this.sortService.buildSortParam(sortState),
     };
 

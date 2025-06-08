@@ -1,0 +1,47 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (medico(); as medicoRef) {
+      <div>
+        <h2 data-cy="medicoDetailsHeading"><span jhiTranslate="parcial2Sw2MApp.medico.detail.title">Medico</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ medicoRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="parcial2Sw2MApp.medico.matricula">Matricula</span></dt>
+          <dd>
+            <span>{{ medicoRef.matricula }}</span>
+          </dd>
+          <dt><span jhiTranslate="parcial2Sw2MApp.medico.user">User</span></dt>
+          <dd>
+            <span>{{ medicoRef.user?.login }}</span>
+          </dd>
+          <dt><span jhiTranslate="parcial2Sw2MApp.medico.especialidades">Especialidades</span></dt>
+          <dd>
+            @for (especialidades of medicoRef.especialidades; track $index; let last = $last) {
+              <span>
+                <a [routerLink]="['/especialidad', especialidades.id, 'view']">{{ especialidades?.id }}</a
+                >{{ last ? '' : ', ' }}
+              </span>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Volver</span>
+        </button>
+
+        <button type="button" [routerLink]="['/medico', medicoRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editar</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

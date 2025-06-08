@@ -1,0 +1,27 @@
+{
+  "parcial2Sw2MApp": {
+    "horarioAtencion": {
+      "home": {
+        "title": "Horario Atencions",
+        "refreshListLabel": "Refrescar lista",
+        "createLabel": "Crear nuevo Horario Atencion",
+        "createOrEditLabel": "Crear o editar Horario Atencion",
+        "notFound": "Ningún Horario Atencions encontrado"
+      },
+      "created": "Un nuevo Horario Atencion ha sido creado con el identificador {{ param }}",
+      "updated": "Un Horario Atencion ha sido actualizado con el identificador {{ param }}",
+      "deleted": "Un Horario Atencion ha sido eliminado con el identificador {{ param }}",
+      "delete": {
+        "question": "¿Seguro que quiere eliminar Horario Atencion {{ id }}?"
+      },
+      "detail": {
+        "title": "Horario Atencion"
+      },
+      "id": "ID",
+      "diaSemana": "Dia Semana",
+      "horaInicio": "Hora Inicio",
+      "horaFin": "Hora Fin",
+      "medico": "Medico"
+    }
+  }
+}

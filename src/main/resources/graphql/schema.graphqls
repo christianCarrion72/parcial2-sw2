@@ -26,13 +26,47 @@ input UserInput {
     authorities: [String!]
 }
 
+# Definición del tipo Medico
+type Medico {
+    id: ID
+    matricula: String!
+    user: User
+    especialidades: [Especialidad]
+}
+
+# Definición del tipo Especialidad
+type Especialidad {
+    id: ID
+    nombre: String!
+    descripcion: String
+}
+
+# Input para crear/actualizar Medico
+input MedicoInput {
+    id: ID
+    matricula: String!
+    userId: ID
+    especialidadesIds: [ID]
+}
+
 type Query {
+    # Queries para User
     getUserByLogin(login: String!): User
     getAllUsers(page: Int, size: Int): [User!]!
+
+    # Queries para Medico
+    getMedicoById(id: ID!): Medico
+    getAllMedicos(page: Int, size: Int, eagerload: Boolean): [Medico!]!
 }
 
 type Mutation {
+    # Mutations para User
     updateUser(userInput: UserInput!): User
     createUser(userInput: UserInput!): User
     deleteUser(login: String!): Boolean
+
+    # Mutations para Medico
+    createMedico(medicoInput: MedicoInput!): Medico
+    updateMedico(id: ID!, medicoInput: MedicoInput!): Medico
+    deleteMedico(id: ID!): Boolean
 }

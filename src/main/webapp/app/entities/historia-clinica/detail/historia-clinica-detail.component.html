@@ -1,0 +1,62 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (historiaClinica(); as historiaClinicaRef) {
+      <div>
+        <h2 data-cy="historiaClinicaDetailsHeading">
+          <span jhiTranslate="parcial2Sw2MApp.historiaClinica.detail.title">Historia Clinica</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ historiaClinicaRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="parcial2Sw2MApp.historiaClinica.fecha">Fecha</span></dt>
+          <dd>
+            <span>{{ historiaClinicaRef.fecha | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="parcial2Sw2MApp.historiaClinica.sintomas">Sintomas</span></dt>
+          <dd>
+            <span>{{ historiaClinicaRef.sintomas }}</span>
+          </dd>
+          <dt><span jhiTranslate="parcial2Sw2MApp.historiaClinica.diagnostico">Diagnostico</span></dt>
+          <dd>
+            <span>{{ historiaClinicaRef.diagnostico }}</span>
+          </dd>
+          <dt><span jhiTranslate="parcial2Sw2MApp.historiaClinica.tratamiento">Tratamiento</span></dt>
+          <dd>
+            <span>{{ historiaClinicaRef.tratamiento }}</span>
+          </dd>
+          <dt><span jhiTranslate="parcial2Sw2MApp.historiaClinica.hashBlockchain">Hash Blockchain</span></dt>
+          <dd>
+            <span>{{ historiaClinicaRef.hashBlockchain }}</span>
+          </dd>
+          <dt><span jhiTranslate="parcial2Sw2MApp.historiaClinica.paciente">Paciente</span></dt>
+          <dd>
+            @if (historiaClinica()!.paciente) {
+              <div>
+                <a [routerLink]="['/paciente', historiaClinica()!.paciente?.id, 'view']">{{
+                  historiaClinicaRef.paciente?.nroHistoriaClinica
+                }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Volver</span>
+        </button>
+
+        <button type="button" [routerLink]="['/historia-clinica', historiaClinicaRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editar</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

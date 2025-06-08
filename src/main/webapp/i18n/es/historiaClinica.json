@@ -1,0 +1,29 @@
+{
+  "parcial2Sw2MApp": {
+    "historiaClinica": {
+      "home": {
+        "title": "Historia Clinicas",
+        "refreshListLabel": "Refrescar lista",
+        "createLabel": "Crear nuevo Historia Clinica",
+        "createOrEditLabel": "Crear o editar Historia Clinica",
+        "notFound": "Ningún Historia Clinicas encontrado"
+      },
+      "created": "Un nuevo Historia Clinica ha sido creado con el identificador {{ param }}",
+      "updated": "Un Historia Clinica ha sido actualizado con el identificador {{ param }}",
+      "deleted": "Un Historia Clinica ha sido eliminado con el identificador {{ param }}",
+      "delete": {
+        "question": "¿Seguro que quiere eliminar Historia Clinica {{ id }}?"
+      },
+      "detail": {
+        "title": "Historia Clinica"
+      },
+      "id": "ID",
+      "fecha": "Fecha",
+      "sintomas": "Sintomas",
+      "diagnostico": "Diagnostico",
+      "tratamiento": "Tratamiento",
+      "hashBlockchain": "Hash Blockchain",
+      "paciente": "Paciente"
+    }
+  }
+}

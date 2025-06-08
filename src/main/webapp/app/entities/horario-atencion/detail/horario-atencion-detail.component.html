@@ -1,0 +1,63 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (horarioAtencion(); as horarioAtencionRef) {
+      <div>
+        <h2 data-cy="horarioAtencionDetailsHeading">
+          <span jhiTranslate="parcial2Sw2MApp.horarioAtencion.detail.title">Horario Atencion</span>
+        </h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ horarioAtencionRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="parcial2Sw2MApp.horarioAtencion.diaSemana">Dia Semana</span></dt>
+          <dd>
+            <span [jhiTranslate]="'parcial2Sw2MApp.DiaSemana.' + (horarioAtencionRef.diaSemana ?? 'null')">{{
+              {
+                null: '',
+                LUNES: 'LUNES',
+                MARTES: 'MARTES',
+                MIERCOLES: 'MIERCOLES',
+                JUEVES: 'JUEVES',
+                VIERNES: 'VIERNES',
+                SABADO: 'SABADO',
+                DOMINGO: 'DOMINGO',
+              }[horarioAtencionRef.diaSemana ?? 'null']
+            }}</span>
+          </dd>
+          <dt><span jhiTranslate="parcial2Sw2MApp.horarioAtencion.horaInicio">Hora Inicio</span></dt>
+          <dd>
+            <span>{{ horarioAtencionRef.horaInicio }}</span>
+          </dd>
+          <dt><span jhiTranslate="parcial2Sw2MApp.horarioAtencion.horaFin">Hora Fin</span></dt>
+          <dd>
+            <span>{{ horarioAtencionRef.horaFin }}</span>
+          </dd>
+          <dt><span jhiTranslate="parcial2Sw2MApp.horarioAtencion.medico">Medico</span></dt>
+          <dd>
+            @if (horarioAtencion()!.medico) {
+              <div>
+                <a [routerLink]="['/medico', horarioAtencion()!.medico?.id, 'view']">{{ horarioAtencionRef.medico?.matricula }}</a>
+              </div>
+            }
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Volver</span>
+        </button>
+
+        <button type="button" [routerLink]="['/horario-atencion', horarioAtencionRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editar</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

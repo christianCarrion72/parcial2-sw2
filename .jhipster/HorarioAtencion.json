@@ -1,0 +1,38 @@
+{
+  "annotations": {
+    "changelogDate": "20250607165817"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "diaSemana",
+      "fieldType": "DiaSemana",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "LUNES,MARTES,MIERCOLES,JUEVES,VIERNES,SABADO,DOMINGO"
+    },
+    {
+      "fieldName": "horaInicio",
+      "fieldType": "LocalTime",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "horaFin",
+      "fieldType": "LocalTime",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "name": "HorarioAtencion",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityField": "matricula",
+      "otherEntityName": "medico",
+      "relationshipName": "medico",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

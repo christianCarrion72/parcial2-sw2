@@ -1,0 +1,108 @@
+//--------------------------------------------------------------
+// Consultorio Médico - JDL
+//--------------------------------------------------------------
+
+// Reutilizamos el User y Authority que JHipster ya creó
+entity User
+entity Authority
+
+// Entidades del consultorio
+entity Paciente {
+  nroHistoriaClinica String required,
+  fechaNacimiento LocalDate,
+  direccion String,
+  telefono String
+}
+
+entity Medico {
+  matricula String required
+}
+
+entity Especialidad {
+  nombre String required,
+  descripcion String
+}
+
+enum EstadoCita {
+  PROGRAMADA,
+  CONFIRMADA,
+  CANCELADA,
+  REALIZADA
+}
+
+entity Cita {
+  fechaHora ZonedDateTime required,
+  estado EstadoCita required,
+  confirmada Boolean
+}
+
+entity HistoriaClinica {
+  fecha ZonedDateTime required,
+  sintomas TextBlob,
+  diagnostico String,
+  tratamiento String,
+  hashBlockchain String
+}
+
+entity Reporte {
+  tipo String required,
+  fechaGeneracion ZonedDateTime required,
+  rutaArchivo String required
+}
+
+// NUEVA ENTIDAD para definir disponibilidad del médico
+enum DiaSemana {
+  LUNES,
+  MARTES,
+  MIERCOLES,
+  JUEVES,
+  VIERNES,
+  SABADO,
+  DOMINGO
+}
+
+entity HorarioAtencion {
+  diaSemana DiaSemana required,
+  horaInicio LocalTime required,
+  horaFin LocalTime required
+}
+
+//--------------------------------------------------------------
+// Relaciones
+//--------------------------------------------------------------
+
+// Simulamos herencia de Usuario: cada Paciente y Medico enlaza a un User
+relationship OneToOne {
+  Paciente{user(login)} to User,
+  Medico{user(login)} to User
+}
+
+// Un Médico puede tener varias Especialidades y viceversa
+relationship ManyToMany {
+  Medico{especialidades} to Especialidad{medicos}
+}
+
+// Citas: cada Cita pertenece a un Paciente y a un Médico
+relationship ManyToOne {
+  Cita{paciente(nroHistoriaClinica)} to Paciente,
+  Cita{medico(matricula)} to Medico,
+  Cita{horario} to HorarioAtencion
+}
+
+// Historias Clínicas: cada historia pertenece a un Paciente
+relationship ManyToOne {
+  HistoriaClinica{paciente(nroHistoriaClinica)} to Paciente
+}
+
+// Horarios de atención asociados a cada Médico
+relationship ManyToOne {
+  HorarioAtencion{medico(matricula)} to Medico
+}
+
+//--------------------------------------------------------------
+// Opciones globales
+//--------------------------------------------------------------
+
+paginate * with pagination
+dto * with mapstruct
+service * with serviceClass

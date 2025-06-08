@@ -1,0 +1,43 @@
+{
+  "annotations": {
+    "changelogDate": "20250607165815"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "fecha",
+      "fieldType": "ZonedDateTime",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "sintomas",
+      "fieldType": "TextBlob"
+    },
+    {
+      "fieldName": "diagnostico",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "tratamiento",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "hashBlockchain",
+      "fieldType": "String"
+    }
+  ],
+  "name": "HistoriaClinica",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityField": "nroHistoriaClinica",
+      "otherEntityName": "paciente",
+      "relationshipName": "paciente",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

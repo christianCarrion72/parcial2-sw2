@@ -1,0 +1,26 @@
+{
+  "parcial2Sw2MApp": {
+    "reporte": {
+      "home": {
+        "title": "Reportes",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Reporte",
+        "createOrEditLabel": "Create or edit a Reporte",
+        "notFound": "No Reportes found"
+      },
+      "created": "A new Reporte is created with identifier {{ param }}",
+      "updated": "A Reporte is updated with identifier {{ param }}",
+      "deleted": "A Reporte is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Reporte {{ id }}?"
+      },
+      "detail": {
+        "title": "Reporte"
+      },
+      "id": "ID",
+      "tipo": "Tipo",
+      "fechaGeneracion": "Fecha Generacion",
+      "rutaArchivo": "Ruta Archivo"
+    }
+  }
+}

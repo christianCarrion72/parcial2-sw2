@@ -10,6 +10,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.parcial2.consul.IntegrationTest;
 import com.parcial2.consul.domain.Authority;
 import com.parcial2.consul.repository.AuthorityRepository;
+import com.parcial2.consul.service.dto.AuthorityDTO;
+import com.parcial2.consul.service.mapper.AuthorityMapper;
 import jakarta.persistence.EntityManager;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
@@ -38,6 +40,9 @@ class AuthorityResourceIT {
 
     @Autowired
     private AuthorityRepository authorityRepository;
+
+    @Autowired
+    private AuthorityMapper authorityMapper;
 
     @Autowired
     private EntityManager em;
@@ -87,18 +92,20 @@ class AuthorityResourceIT {
     void createAuthority() throws Exception {
         long databaseSizeBeforeCreate = getRepositoryCount();
         // Create the Authority
-        var returnedAuthority = om.readValue(
+        AuthorityDTO authorityDTO = authorityMapper.toDto(authority);
+        var returnedAuthorityDTO = om.readValue(
             restAuthorityMockMvc
-                .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(authority)))
+                .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(authorityDTO)))
                 .andExpect(status().isCreated())
                 .andReturn()
                 .getResponse()
                 .getContentAsString(),
-            Authority.class
+            AuthorityDTO.class
         );
 
         // Validate the Authority in the database
         assertIncrementedRepositoryCount(databaseSizeBeforeCreate);
+        var returnedAuthority = authorityMapper.toEntity(returnedAuthorityDTO);
         assertAuthorityUpdatableFieldsEquals(returnedAuthority, getPersistedAuthority(returnedAuthority));
 
         insertedAuthority = returnedAuthority;
@@ -109,12 +116,13 @@ class AuthorityResourceIT {
     void createAuthorityWithExistingId() throws Exception {
         // Create the Authority with an existing ID
         insertedAuthority = authorityRepository.saveAndFlush(authority);
+        AuthorityDTO authorityDTO = authorityMapper.toDto(authority);
 
         long databaseSizeBeforeCreate = getRepositoryCount();
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restAuthorityMockMvc
-            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(authority)))
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(om.writeValueAsBytes(authorityDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the Authority in the database

@@ -1,0 +1,42 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    @if (reporte(); as reporteRef) {
+      <div>
+        <h2 data-cy="reporteDetailsHeading"><span jhiTranslate="parcial2Sw2MApp.reporte.detail.title">Reporte</span></h2>
+
+        <hr />
+
+        <jhi-alert-error />
+
+        <jhi-alert />
+
+        <dl class="row-md jh-entity-details">
+          <dt><span jhiTranslate="global.field.id">ID</span></dt>
+          <dd>
+            <span>{{ reporteRef.id }}</span>
+          </dd>
+          <dt><span jhiTranslate="parcial2Sw2MApp.reporte.tipo">Tipo</span></dt>
+          <dd>
+            <span>{{ reporteRef.tipo }}</span>
+          </dd>
+          <dt><span jhiTranslate="parcial2Sw2MApp.reporte.fechaGeneracion">Fecha Generacion</span></dt>
+          <dd>
+            <span>{{ reporteRef.fechaGeneracion | formatMediumDatetime }}</span>
+          </dd>
+          <dt><span jhiTranslate="parcial2Sw2MApp.reporte.rutaArchivo">Ruta Archivo</span></dt>
+          <dd>
+            <span>{{ reporteRef.rutaArchivo }}</span>
+          </dd>
+        </dl>
+
+        <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+          <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Volver</span>
+        </button>
+
+        <button type="button" [routerLink]="['/reporte', reporteRef.id, 'edit']" class="btn btn-primary">
+          <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Editar</span>
+        </button>
+      </div>
+    }
+  </div>
+</div>

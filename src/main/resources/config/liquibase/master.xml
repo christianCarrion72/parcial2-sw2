@@ -12,7 +12,21 @@
     <property name="timeType" value="time(6)" dbms="postgresql"/>
 
     <include file="config/liquibase/changelog/00000000000000_initial_schema.xml" relativeToChangelogFile="false"/>
+    <!--include file="config/liquibase/changelog/20250607165809_added_entity_User.xml" relativeToChangelogFile="false"/-->
+    <!--include file="config/liquibase/changelog/20250607165810_added_entity_Authority.xml" relativeToChangelogFile="false"/-->
+    <include file="config/liquibase/changelog/20250607165811_added_entity_Paciente.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250607165812_added_entity_Medico.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250607165813_added_entity_Especialidad.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250607165814_added_entity_Cita.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250607165815_added_entity_HistoriaClinica.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250607165816_added_entity_Reporte.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250607165817_added_entity_HorarioAtencion.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-changelog - JHipster will add liquibase changelogs here -->
+    <include file="config/liquibase/changelog/20250607165811_added_entity_constraints_Paciente.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250607165812_added_entity_constraints_Medico.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250607165814_added_entity_constraints_Cita.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250607165815_added_entity_constraints_HistoriaClinica.xml" relativeToChangelogFile="false"/>
+    <include file="config/liquibase/changelog/20250607165817_added_entity_constraints_HorarioAtencion.xml" relativeToChangelogFile="false"/>
     <!-- jhipster-needle-liquibase-add-constraints-changelog - JHipster will add liquibase constraints changelogs here -->
     <!-- jhipster-needle-liquibase-add-incremental-changelog - JHipster will add incremental liquibase changelogs here -->
 </databaseChangeLog>

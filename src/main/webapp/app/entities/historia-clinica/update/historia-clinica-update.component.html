@@ -1,0 +1,129 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2
+        id="jhi-historia-clinica-heading"
+        data-cy="HistoriaClinicaCreateUpdateHeading"
+        jhiTranslate="parcial2Sw2MApp.historiaClinica.home.createOrEditLabel"
+      >
+        Crear o editar Historia Clinica
+      </h2>
+
+      <div>
+        <jhi-alert-error />
+
+        @if (editForm.controls.id.value !== null) {
+          <div class="mb-3">
+            <label class="form-label" for="field_id" jhiTranslate="parcial2Sw2MApp.historiaClinica.id">ID</label>
+            <input type="number" class="form-control" name="id" id="field_id" data-cy="id" formControlName="id" [readonly]="true" />
+          </div>
+        }
+
+        @let fechaRef = editForm.get('fecha')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_fecha" jhiTranslate="parcial2Sw2MApp.historiaClinica.fecha">Fecha</label>
+          <div class="d-flex">
+            <input
+              id="field_fecha"
+              data-cy="fecha"
+              type="datetime-local"
+              class="form-control"
+              name="fecha"
+              formControlName="fecha"
+              placeholder="YYYY-MM-DD HH:mm"
+            />
+          </div>
+          @if (fechaRef.invalid && (fechaRef.dirty || fechaRef.touched)) {
+            <div>
+              @if (editForm.get('fecha')?.errors?.required) {
+                <small class="form-text text-danger" jhiTranslate="entity.validation.required">Este campo es obligatorio.</small>
+              }
+              <small
+                class="form-text text-danger"
+                [hidden]="!editForm.get('fecha')?.errors?.datetimelocal"
+                jhiTranslate="entity.validation.datetimelocal"
+                >Este campo debe ser una fecha y hora.</small
+              >
+            </div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_sintomas" jhiTranslate="parcial2Sw2MApp.historiaClinica.sintomas">Sintomas</label>
+          <textarea class="form-control" name="sintomas" id="field_sintomas" data-cy="sintomas" formControlName="sintomas"></textarea>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_diagnostico" jhiTranslate="parcial2Sw2MApp.historiaClinica.diagnostico">Diagnostico</label>
+          <input
+            type="text"
+            class="form-control"
+            name="diagnostico"
+            id="field_diagnostico"
+            data-cy="diagnostico"
+            formControlName="diagnostico"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_tratamiento" jhiTranslate="parcial2Sw2MApp.historiaClinica.tratamiento">Tratamiento</label>
+          <input
+            type="text"
+            class="form-control"
+            name="tratamiento"
+            id="field_tratamiento"
+            data-cy="tratamiento"
+            formControlName="tratamiento"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_hashBlockchain" jhiTranslate="parcial2Sw2MApp.historiaClinica.hashBlockchain"
+            >Hash Blockchain</label
+          >
+          <input
+            type="text"
+            class="form-control"
+            name="hashBlockchain"
+            id="field_hashBlockchain"
+            data-cy="hashBlockchain"
+            formControlName="hashBlockchain"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="field_paciente" jhiTranslate="parcial2Sw2MApp.historiaClinica.paciente">Paciente</label>
+          <select
+            class="form-control"
+            id="field_paciente"
+            data-cy="paciente"
+            name="paciente"
+            formControlName="paciente"
+            [compareWith]="comparePaciente"
+          >
+            <option [ngValue]="null"></option>
+            @for (pacienteOption of pacientesSharedCollection; track $index) {
+              <option [ngValue]="pacienteOption">{{ pacienteOption.nroHistoriaClinica }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban"></fa-icon>&nbsp;<span jhiTranslate="entity.action.cancel">Cancelar</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save"></fa-icon>&nbsp;<span jhiTranslate="entity.action.save">Guardar</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

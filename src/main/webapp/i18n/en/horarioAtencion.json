@@ -1,0 +1,27 @@
+{
+  "parcial2Sw2MApp": {
+    "horarioAtencion": {
+      "home": {
+        "title": "Horario Atencions",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Horario Atencion",
+        "createOrEditLabel": "Create or edit a Horario Atencion",
+        "notFound": "No Horario Atencions found"
+      },
+      "created": "A new Horario Atencion is created with identifier {{ param }}",
+      "updated": "A Horario Atencion is updated with identifier {{ param }}",
+      "deleted": "A Horario Atencion is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Horario Atencion {{ id }}?"
+      },
+      "detail": {
+        "title": "Horario Atencion"
+      },
+      "id": "ID",
+      "diaSemana": "Dia Semana",
+      "horaInicio": "Hora Inicio",
+      "horaFin": "Hora Fin",
+      "medico": "Medico"
+    }
+  }
+}

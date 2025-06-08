@@ -1,0 +1,26 @@
+{
+  "parcial2Sw2MApp": {
+    "medico": {
+      "home": {
+        "title": "Medicos",
+        "refreshListLabel": "Refrescar lista",
+        "createLabel": "Crear nuevo Medico",
+        "createOrEditLabel": "Crear o editar Medico",
+        "notFound": "Ningún Medicos encontrado"
+      },
+      "created": "Un nuevo Medico ha sido creado con el identificador {{ param }}",
+      "updated": "Un Medico ha sido actualizado con el identificador {{ param }}",
+      "deleted": "Un Medico ha sido eliminado con el identificador {{ param }}",
+      "delete": {
+        "question": "¿Seguro que quiere eliminar Medico {{ id }}?"
+      },
+      "detail": {
+        "title": "Medico"
+      },
+      "id": "ID",
+      "matricula": "Matricula",
+      "user": "User",
+      "especialidades": "Especialidades"
+    }
+  }
+}

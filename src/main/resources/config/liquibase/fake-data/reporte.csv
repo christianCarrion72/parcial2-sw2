@@ -1,0 +1,12 @@
+id;tipo;fecha_generacion;ruta_archivo
+1;CONSULTAS;2025-06-06T08:30:00;/reportes/consultas_2025-06-06.pdf
+2;PACIENTES;2025-06-06T09:00:00;/reportes/pacientes_2025-06-06.pdf
+3;FINANCIEROS;2025-06-07T10:15:00;/reportes/finanzas_2025-06-07.pdf
+4;CONSULTAS;2025-06-07T11:45:00;/reportes/consultas_2025-06-07.pdf
+5;PACIENTES;2025-06-07T13:00:00;/reportes/pacientes_2025-06-07.pdf
+6;CONSULTAS;2025-06-07T14:30:00;/reportes/consultas_2025-06-07-tarde.pdf
+7;PACIENTES;2025-06-07T15:45:00;/reportes/pacientes_2025-06-07-tarde.pdf
+8;FINANCIEROS;2025-06-07T16:30:00;/reportes/finanzas_2025-06-07-tarde.pdf
+9;AUSENTISMO;2025-06-07T17:15:00;/reportes/ausentismo_2025-06-07.pdf
+10;MEDICOS_SOBRECARGADOS;2025-06-07T18:00:00;/reportes/medicos_sobrecargados_2025-06-07.pdf
+
