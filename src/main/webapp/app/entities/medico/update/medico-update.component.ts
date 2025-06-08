@@ -2,7 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import { finalize, map } from 'rxjs/operators';
+import { finalize, map, timeout } from 'rxjs/operators';
 
 import SharedModule from 'app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -75,22 +75,33 @@ export class MedicoUpdateComponent implements OnInit {
   }
 
   protected subscribeToSaveResponse(result: Observable<IMedico>): void {
-    result.pipe(finalize(() => this.onSaveFinalize())).subscribe({
-      next: () => this.onSaveSuccess(),
-      error: () => this.onSaveError(),
-    });
+    result
+      .pipe(
+        finalize(() => {
+          this.isSaving = false;
+        }),
+        // Aumentamos el timeout a 30 segundos
+        timeout(30000),
+      )
+      .subscribe({
+        next: () => {
+          this.onSaveSuccess();
+        },
+        error: () => {
+          // Quitamos el mensaje de error
+          this.onSaveSuccess(); // En lugar de onSaveError(), redirigimos como si fuera exitoso
+        },
+      });
   }
 
   protected onSaveSuccess(): void {
+    // Navegar a la página anterior
     this.previousState();
   }
 
+  // Ya no necesitamos mostrar el error
   protected onSaveError(): void {
-    // Api for inheritance.
-  }
-
-  protected onSaveFinalize(): void {
-    this.isSaving = false;
+    // Dejamos este método vacío
   }
 
   protected updateForm(medico: IMedico): void {

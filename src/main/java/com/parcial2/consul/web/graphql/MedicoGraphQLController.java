@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -43,17 +44,37 @@ public class MedicoGraphQLController {
     }
 
     @QueryMapping
-    public List<MedicoDTO> getAllMedicos(@Argument Integer page, @Argument Integer size, @Argument Boolean eagerload) {
-        log.debug("GraphQL query to get all Medicos");
+    public List<MedicoDTO> getAllMedicos(
+        @Argument Integer page,
+        @Argument Integer size,
+        @Argument String sort,
+        @Argument Boolean eagerload
+    ) {
+        log.debug("GraphQL query to get all Medicos with sort: {}", sort);
+
         int pageNumber = (page != null) ? page : 0;
         int pageSize = (size != null) ? size : 20;
         boolean eager = (eagerload != null) ? eagerload : true;
 
+        // Crear el PageRequest con ordenamiento
+        PageRequest pageRequest;
+        if (sort != null && !sort.isEmpty()) {
+            String[] sortParts = sort.split(",");
+            String property = sortParts[0];
+            Sort.Direction direction = sortParts.length > 1 && sortParts[1].equalsIgnoreCase("desc")
+                ? Sort.Direction.DESC
+                : Sort.Direction.ASC;
+            pageRequest = PageRequest.of(pageNumber, pageSize, Sort.by(direction, property));
+        } else {
+            // Ordenamiento por defecto por ID ascendente
+            pageRequest = PageRequest.of(pageNumber, pageSize, Sort.by(Sort.Direction.ASC, "id"));
+        }
+
         Page<MedicoDTO> medicoPage;
         if (eager) {
-            medicoPage = medicoService.findAllWithEagerRelationships(PageRequest.of(pageNumber, pageSize));
+            medicoPage = medicoService.findAllWithEagerRelationships(pageRequest);
         } else {
-            medicoPage = medicoService.findAll(PageRequest.of(pageNumber, pageSize));
+            medicoPage = medicoService.findAll(pageRequest);
         }
 
         return medicoPage.getContent();

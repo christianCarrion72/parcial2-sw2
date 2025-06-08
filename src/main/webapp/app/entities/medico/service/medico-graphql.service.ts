@@ -1,15 +1,66 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { IMedico } from '../medico.model';
+
+// Definir el tipo de respuesta
+export type EntityArrayResponseType = HttpResponse<IMedico[]>;
 
 @Injectable({ providedIn: 'root' })
 export class MedicoGraphQLService {
   private graphqlUrl = 'api/graphql';
 
   constructor(private http: HttpClient) {}
+
+  query(queryObject: any): Observable<EntityArrayResponseType> {
+    const query = `
+      query getAllMedicos($page: Int, $size: Int, $sort: String) {
+        getAllMedicos(page: $page, size: $size, sort: $sort, eagerload: true) {
+          id
+          matricula
+          user {
+            id
+            login
+          }
+          especialidades {
+            id
+            nombre
+          }
+        }
+      }
+    `;
+
+    // Convertir el sort a string si es un array
+    let sortString = queryObject.sort;
+    if (Array.isArray(queryObject.sort)) {
+      sortString = queryObject.sort.join(',');
+    }
+
+    const variables = {
+      page: queryObject.page,
+      size: queryObject.size,
+      sort: sortString, // Usar el string convertido
+    };
+
+    console.log('Query variables:', variables); // Para debug
+
+    return this.http.post<any>(this.graphqlUrl, { query, variables }).pipe(
+      map(response => {
+        if (response.errors) {
+          throw new Error('GraphQL Error: ' + JSON.stringify(response.errors));
+        }
+        const medicos = response.data.getAllMedicos;
+        return new HttpResponse<IMedico[]>({
+          body: medicos,
+          headers: new HttpHeaders({
+            'X-Total-Count': response.data.totalCount || medicos.length.toString(),
+          }),
+        });
+      }),
+    );
+  }
 
   create(medico: IMedico): Observable<IMedico> {
     const query = `

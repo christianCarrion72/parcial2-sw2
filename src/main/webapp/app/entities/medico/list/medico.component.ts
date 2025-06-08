@@ -14,6 +14,7 @@ import { DEFAULT_SORT_DATA, ITEM_DELETED_EVENT, SORT } from 'app/config/navigati
 import { IMedico } from '../medico.model';
 import { EntityArrayResponseType, MedicoService } from '../service/medico.service';
 import { MedicoDeleteDialogComponent } from '../delete/medico-delete-dialog.component';
+import { MedicoGraphQLService } from '../service/medico-graphql.service';
 
 @Component({
   selector: 'jhi-medico',
@@ -37,6 +38,7 @@ export class MedicoComponent implements OnInit {
   protected readonly sortService = inject(SortService);
   protected modalService = inject(NgbModal);
   protected ngZone = inject(NgZone);
+  protected readonly medicoGraphQLService = inject(MedicoGraphQLService);
 
   trackId = (item: IMedico): number => this.medicoService.getMedicoIdentifier(item);
 
@@ -52,11 +54,17 @@ export class MedicoComponent implements OnInit {
   delete(medico: IMedico): void {
     const modalRef = this.modalService.open(MedicoDeleteDialogComponent, { size: 'lg', backdrop: 'static' });
     modalRef.componentInstance.medico = medico;
-    // unsubscribe not needed because closed completes on modal close
     modalRef.closed
       .pipe(
         filter(reason => reason === ITEM_DELETED_EVENT),
-        tap(() => this.load()),
+        // Usar el servicio GraphQL para eliminar
+        tap(() => {
+          if (medico.id) {
+            this.medicoGraphQLService.delete(medico.id).subscribe(() => {
+              this.load();
+            });
+          }
+        }),
       )
       .subscribe();
   }
@@ -105,10 +113,9 @@ export class MedicoComponent implements OnInit {
     const queryObject: any = {
       page: pageToLoad - 1,
       size: this.itemsPerPage,
-      eagerload: true,
       sort: this.sortService.buildSortParam(this.sortState()),
     };
-    return this.medicoService.query(queryObject).pipe(tap(() => (this.isLoading = false)));
+    return this.medicoGraphQLService.query(queryObject).pipe(tap(() => (this.isLoading = false)));
   }
 
   protected handleNavigation(page: number, sortState: SortState): void {

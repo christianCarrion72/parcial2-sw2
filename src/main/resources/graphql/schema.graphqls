@@ -37,7 +37,7 @@ type Medico {
 # Definición del tipo Especialidad
 type Especialidad {
     id: ID
-    nombre: String!
+    nombre: String
     descripcion: String
 }
 
@@ -56,7 +56,7 @@ type Query {
 
     # Queries para Medico
     getMedicoById(id: ID!): Medico
-    getAllMedicos(page: Int, size: Int, eagerload: Boolean): [Medico!]!
+    getAllMedicos(page: Int, size: Int, sort: String, eagerload: Boolean): [Medico!]!
 }
 
 type Mutation {
