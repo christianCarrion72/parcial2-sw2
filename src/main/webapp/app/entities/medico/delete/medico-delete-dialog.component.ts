@@ -5,7 +5,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import SharedModule from 'app/shared/shared.module';
 import { ITEM_DELETED_EVENT } from 'app/config/navigation.constants';
 import { IMedico } from '../medico.model';
-import { MedicoService } from '../service/medico.service';
+import { MedicoGraphQLService } from '../service/medico-graphql.service';
 
 @Component({
   templateUrl: './medico-delete-dialog.component.html',
@@ -14,7 +14,7 @@ import { MedicoService } from '../service/medico.service';
 export class MedicoDeleteDialogComponent {
   medico?: IMedico;
 
-  protected medicoService = inject(MedicoService);
+  protected medicoGraphQLService = inject(MedicoGraphQLService);
   protected activeModal = inject(NgbActiveModal);
 
   cancel(): void {
@@ -22,7 +22,7 @@ export class MedicoDeleteDialogComponent {
   }
 
   confirmDelete(id: number): void {
-    this.medicoService.delete(id).subscribe(() => {
+    this.medicoGraphQLService.delete(id).subscribe(() => {
       this.activeModal.close(ITEM_DELETED_EVENT);
     });
   }

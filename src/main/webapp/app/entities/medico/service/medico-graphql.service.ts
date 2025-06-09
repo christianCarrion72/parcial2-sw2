@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import { IMedico } from '../medico.model';
+import { IMedico, NewMedico } from '../medico.model';
 
 // Definir el tipo de respuesta
 export type EntityArrayResponseType = HttpResponse<IMedico[]>;
@@ -62,36 +62,40 @@ export class MedicoGraphQLService {
     );
   }
 
-  create(medico: IMedico): Observable<IMedico> {
+  create(medico: NewMedico | IMedico): Observable<IMedico> {
     const query = `
-      mutation CreateMedico($medicoInput: MedicoInput!) {
-        createMedico(medicoInput: $medicoInput) {
-          id
-          matricula
-          user {
+        mutation CreateMedico($medicoInput: MedicoInput!) {
+          createMedico(medicoInput: $medicoInput) {
             id
-            login
-          }
-          especialidades {
-            id
-            nombre
-            descripcion
+            matricula
+            user {
+              id
+              login
+            }
+            especialidades {
+              id
+              nombre
+              descripcion
+            }
           }
         }
-      }
-    `;
+      `;
 
+    // Usar el mismo formato que en update
     const variables = {
       medicoInput: {
         matricula: medico.matricula,
         userId: medico.user?.id,
-        especialidadesIds: medico.especialidades?.map(esp => esp.id),
+        especialidadesIds: medico.especialidades?.map(esp => esp.id) || [],
       },
     };
+
+    console.log('Enviando creación con variables:', JSON.stringify(variables));
 
     return this.http.post<any>(this.graphqlUrl, { query, variables }).pipe(
       map(response => {
         if (response.errors) {
+          console.error('Error en GraphQL:', response.errors);
           throw new Error('GraphQL Error: ' + JSON.stringify(response.errors));
         }
         return response.data.createMedico;
@@ -163,7 +167,14 @@ export class MedicoGraphQLService {
 
     const variables = { id };
 
-    return this.http.post<any>(this.graphqlUrl, { query, variables }).pipe(map(response => response.data.getMedicoById));
+    return this.http.post<any>(this.graphqlUrl, { query, variables }).pipe(
+      map(response => {
+        if (response.errors) {
+          throw new Error('GraphQL Error: ' + JSON.stringify(response.errors));
+        }
+        return response.data.getMedicoById;
+      }),
+    );
   }
 
   delete(id: number): Observable<boolean> {
@@ -175,6 +186,18 @@ export class MedicoGraphQLService {
 
     const variables = { id };
 
-    return this.http.post<any>(this.graphqlUrl, { query, variables }).pipe(map(response => response.data.deleteMedico));
+    return this.http
+      .post<any>(this.graphqlUrl, {
+        query,
+        variables: { id },
+      })
+      .pipe(
+        map(response => {
+          if (response.errors) {
+            throw new Error('GraphQL Error: ' + JSON.stringify(response.errors));
+          }
+          return response.data.deleteMedico;
+        }),
+      );
   }
 }

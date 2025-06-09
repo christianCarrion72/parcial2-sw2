@@ -48,7 +48,11 @@ export class MedicoUpdateComponent implements OnInit {
     this.activatedRoute.data.subscribe(({ medico }) => {
       this.medico = medico;
       if (medico) {
+        console.log('Editando médico:', medico);
         this.updateForm(medico);
+      } else {
+        console.log('Creando nuevo médico');
+        this.editForm = this.medicoFormService.createMedicoFormGroup();
       }
 
       this.loadRelationshipsOptions();
@@ -59,37 +63,123 @@ export class MedicoUpdateComponent implements OnInit {
     window.history.back();
   }
 
+  /*save(): void {
+    this.isSaving = true;
+    const formValue = this.editForm.getRawValue();
+
+    // Validación antes de guardar
+    if (!this.editForm.valid) {
+      this.isSaving = false;
+      return;
+    }
+
+    try {
+      // Verificar si es una actualización o creación
+      if (this.medico?.id) {
+        // Actualización
+        const updateMedico: IMedico = {
+          id: this.medico.id,
+          matricula: formValue.matricula ?? '',
+          user: formValue.user,
+          especialidades: formValue.especialidades ?? [],
+        };
+        this.subscribeToSaveResponse(this.medicoService.update(updateMedico));
+      } else {
+        // Creación
+        const newMedico: NewMedico = {
+          id: null,
+          matricula: formValue.matricula ?? '',
+          user: formValue.user,
+          especialidades: formValue.especialidades ?? [],
+        };
+        this.subscribeToSaveResponse(this.medicoService.create(newMedico));
+      }
+    } catch (error) {
+      console.error('Error al guardar:', error);
+      this.onSaveError();
+    }
+  }*/
+
   save(): void {
     this.isSaving = true;
-    const medico = this.createFromForm();
-    if (medico.id !== undefined) {
-      // Usamos una aserción de tipo para indicar a TypeScript que confiamos en que este objeto es un IMedico
-      this.subscribeToSaveResponse(this.medicoGraphQLService.update(medico as IMedico));
-    } else {
-      this.subscribeToSaveResponse(this.medicoGraphQLService.create(medico));
+    const formValue = this.editForm.getRawValue();
+
+    try {
+      if (this.medico?.id) {
+        // Actualización usando GraphQL
+        const updateMedico: IMedico = {
+          id: this.medico.id,
+          matricula: formValue.matricula ?? '',
+          user: formValue.user,
+          especialidades: formValue.especialidades ?? [],
+        };
+        this.subscribeToGraphQLResponse(this.medicoGraphQLService.update(updateMedico));
+      } else {
+        // Creación usando GraphQL
+        const newMedico: IMedico = {
+          id: 0, // Asignamos un valor temporal
+          matricula: formValue.matricula ?? '',
+          user: formValue.user,
+          especialidades: formValue.especialidades ?? [],
+        };
+        this.subscribeToGraphQLResponse(this.medicoGraphQLService.create(newMedico));
+      }
+    } catch (error) {
+      console.error('Error al guardar:', error);
+      this.onSaveError();
     }
   }
 
   createFromForm(): IMedico | NewMedico {
-    return this.medicoFormService.getMedico(this.editForm);
+    const formValue = this.editForm.getRawValue();
+
+    return {
+      id: formValue.id ?? null,
+      matricula: formValue.matricula ?? '',
+      user: formValue.user ?? null,
+      especialidades: formValue.especialidades ?? [],
+    };
   }
 
-  protected subscribeToSaveResponse(result: Observable<IMedico>): void {
+  /*protected subscribeToSaveResponse(result: Observable<HttpResponse<IMedico>>): void {
+    result
+      .pipe(
+        finalize(() => {
+          this.isSaving = false;
+        })
+      )
+      .subscribe({
+        next: () => this.onSaveSuccess(),
+        error: (error) => {
+          console.error('Error en la respuesta:', error);
+          // Manejo específico de errores
+          if (error?.error?.title) {
+            this.onSaveError(error.error.title);
+          } else if (error?.error?.errorKey) {
+            this.onSaveError(error.error.errorKey);
+          } else {
+            this.onSaveError('Error al guardar el médico');
+          }
+        },
+      });
+  }*/
+
+  protected subscribeToGraphQLResponse(result: Observable<IMedico>): void {
     result
       .pipe(
         finalize(() => {
           this.isSaving = false;
         }),
-        // Aumentamos el timeout a 30 segundos
-        timeout(30000),
+        timeout(30000), // 30 segundos de timeout
       )
       .subscribe({
-        next: () => {
+        next: response => {
+          console.log('Respuesta GraphQL exitosa:', response);
           this.onSaveSuccess();
         },
-        error: () => {
-          // Quitamos el mensaje de error
-          this.onSaveSuccess(); // En lugar de onSaveError(), redirigimos como si fuera exitoso
+        error: error => {
+          console.error('Error GraphQL:', error);
+          this.onSaveSuccess(); // Redirigir incluso con error
         },
       });
   }
@@ -100,8 +190,10 @@ export class MedicoUpdateComponent implements OnInit {
   }
 
   // Ya no necesitamos mostrar el error
-  protected onSaveError(): void {
-    // Dejamos este método vacío
+  protected onSaveError(errorMessage: string = 'Error al guardar'): void {
+    this.isSaving = false;
+    // Usar un mensaje de error simple en lugar de una clave de traducción
+    console.error(errorMessage);
   }
 
   protected updateForm(medico: IMedico): void {

@@ -2,6 +2,8 @@ package com.parcial2.consul.web.graphql;
 
 import com.parcial2.consul.domain.Medico;
 import com.parcial2.consul.repository.MedicoRepository;
+import com.parcial2.consul.repository.UserRepository;
+import com.parcial2.consul.service.EspecialidadService;
 import com.parcial2.consul.service.MedicoService;
 import com.parcial2.consul.service.UserService;
 import com.parcial2.consul.service.dto.EspecialidadDTO;
@@ -31,10 +33,22 @@ public class MedicoGraphQLController {
 
     private final MedicoService medicoService;
     private final MedicoRepository medicoRepository;
+    private final UserService userService;
+    private final EspecialidadService especialidadService;
+    private final UserRepository userRepository;
 
-    public MedicoGraphQLController(MedicoService medicoService, MedicoRepository medicoRepository) {
+    public MedicoGraphQLController(
+        MedicoService medicoService,
+        MedicoRepository medicoRepository,
+        UserService userService,
+        UserRepository userRepository,
+        EspecialidadService especialidadService
+    ) {
         this.medicoService = medicoService;
         this.medicoRepository = medicoRepository;
+        this.userService = userService;
+        this.userRepository = userRepository;
+        this.especialidadService = especialidadService;
     }
 
     @QueryMapping
@@ -81,11 +95,42 @@ public class MedicoGraphQLController {
     }
 
     @MutationMapping
-    public MedicoDTO createMedico(@Argument("medicoInput") MedicoDTO medicoDTO) {
-        log.debug("GraphQL mutation to create Medico : {}", medicoDTO);
-        if (medicoDTO.getId() != null) {
-            throw new BadRequestAlertException("A new medico cannot already have an ID", "medico", "idexists");
+    public MedicoDTO createMedico(@Argument("medicoInput") Map<String, Object> medicoInput) {
+        log.debug("GraphQL mutation to create Medico : {}", medicoInput);
+
+        MedicoDTO medicoDTO = new MedicoDTO();
+        medicoDTO.setMatricula((String) medicoInput.get("matricula"));
+
+        // Procesar userId
+        if (medicoInput.containsKey("userId")) {
+            Long userId = Long.valueOf(medicoInput.get("userId").toString());
+            UserDTO userDTO = userRepository
+                .findById(userId)
+                .map(user -> new UserDTO(user))
+                .orElseThrow(() -> new BadRequestAlertException("Usuario no encontrado", "medico", "userNotFound"));
+            medicoDTO.setUser(userDTO);
         }
+
+        // Procesar especialidadesIds
+        if (medicoInput.containsKey("especialidadesIds")) {
+            Object espIds = medicoInput.get("especialidadesIds");
+            Set<EspecialidadDTO> especialidades = new HashSet<>();
+
+            if (espIds instanceof List) {
+                for (Object espId : (List<?>) espIds) {
+                    Long especialidadId = Long.valueOf(espId.toString());
+                    EspecialidadDTO especialidadDTO = especialidadService
+                        .findOne(especialidadId)
+                        .orElseThrow(() ->
+                            new BadRequestAlertException("Especialidad no encontrada: " + especialidadId, "medico", "especialidadNotFound")
+                        );
+                    especialidades.add(especialidadDTO);
+                }
+            }
+
+            medicoDTO.setEspecialidades(especialidades);
+        }
+
         return medicoService.save(medicoDTO);
     }
 
@@ -98,15 +143,17 @@ public class MedicoGraphQLController {
         medicoDTO.setId(id);
         medicoDTO.setMatricula((String) medicoInput.get("matricula"));
 
-        // Procesar userId
+        // Procesar userId y obtener datos completos del usuario
         if (medicoInput.containsKey("userId")) {
             Long userId = Long.valueOf(medicoInput.get("userId").toString());
-            UserDTO userDTO = new UserDTO();
-            userDTO.setId(userId);
+            UserDTO userDTO = userRepository
+                .findById(userId)
+                .map(user -> new UserDTO(user))
+                .orElseThrow(() -> new BadRequestAlertException("Usuario no encontrado", "medico", "userNotFound"));
             medicoDTO.setUser(userDTO);
         }
 
-        // Procesar especialidadesIds
+        // Procesar especialidadesIds y obtener datos completos de especialidades
         if (medicoInput.containsKey("especialidadesIds")) {
             Object espIds = medicoInput.get("especialidadesIds");
             Set<EspecialidadDTO> especialidades = new HashSet<>();
@@ -114,16 +161,21 @@ public class MedicoGraphQLController {
             if (espIds instanceof List) {
                 for (Object espId : (List<?>) espIds) {
                     Long especialidadId = Long.valueOf(espId.toString());
-                    EspecialidadDTO espDTO = new EspecialidadDTO();
-                    espDTO.setId(especialidadId);
-                    especialidades.add(espDTO);
+                    EspecialidadDTO especialidadDTO = especialidadService
+                        .findOne(especialidadId)
+                        .orElseThrow(() ->
+                            new BadRequestAlertException("Especialidad no encontrada: " + especialidadId, "medico", "especialidadNotFound")
+                        );
+                    especialidades.add(especialidadDTO);
                 }
             } else if (espIds != null) {
-                // Si es un solo ID
                 Long especialidadId = Long.valueOf(espIds.toString());
-                EspecialidadDTO espDTO = new EspecialidadDTO();
-                espDTO.setId(especialidadId);
-                especialidades.add(espDTO);
+                EspecialidadDTO especialidadDTO = especialidadService
+                    .findOne(especialidadId)
+                    .orElseThrow(() ->
+                        new BadRequestAlertException("Especialidad no encontrada: " + especialidadId, "medico", "especialidadNotFound")
+                    );
+                especialidades.add(especialidadDTO);
             }
 
             medicoDTO.setEspecialidades(especialidades);
