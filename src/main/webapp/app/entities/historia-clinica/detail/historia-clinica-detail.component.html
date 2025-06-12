@@ -35,7 +35,9 @@
           </dd>
           <dt><span jhiTranslate="parcial2Sw2MApp.historiaClinica.hashBlockchain">Hash Blockchain</span></dt>
           <dd>
-            <span>{{ historiaClinicaRef.hashBlockchain }}</span>
+            <a [href]="'https://sepolia.etherscan.io/tx/' + historiaClinicaRef.hashBlockchain" target="_blank" rel="noopener noreferrer">
+              Buscar en la Blockchain
+            </a>
           </dd>
           <dt><span jhiTranslate="parcial2Sw2MApp.historiaClinica.paciente">Paciente</span></dt>
           <dd>

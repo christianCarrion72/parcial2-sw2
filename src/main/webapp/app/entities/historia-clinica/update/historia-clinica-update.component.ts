@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { HttpResponse } from '@angular/common/http';
+import { HttpResponse, HttpClient, HttpHeaders } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
 import { finalize, map } from 'rxjs/operators';
@@ -13,7 +13,7 @@ import { DataUtils, FileLoadError } from 'app/core/util/data-util.service';
 import { IPaciente } from 'app/entities/paciente/paciente.model';
 import { PacienteService } from 'app/entities/paciente/service/paciente.service';
 import { HistoriaClinicaService } from '../service/historia-clinica.service';
-import { IHistoriaClinica } from '../historia-clinica.model';
+import { IHistoriaClinica, NewHistoriaClinica } from '../historia-clinica.model';
 import { HistoriaClinicaFormGroup, HistoriaClinicaFormService } from './historia-clinica-form.service';
 
 @Component({
@@ -27,6 +27,7 @@ export class HistoriaClinicaUpdateComponent implements OnInit {
 
   pacientesSharedCollection: IPaciente[] = [];
 
+  protected http = inject(HttpClient);
   protected dataUtils = inject(DataUtils);
   protected eventManager = inject(EventManager);
   protected historiaClinicaService = inject(HistoriaClinicaService);
@@ -69,7 +70,7 @@ export class HistoriaClinicaUpdateComponent implements OnInit {
     window.history.back();
   }
 
-  save(): void {
+  /*save(): void {
     this.isSaving = true;
     const historiaClinica = this.historiaClinicaFormService.getHistoriaClinica(this.editForm);
     if (historiaClinica.id !== null) {
@@ -77,6 +78,60 @@ export class HistoriaClinicaUpdateComponent implements OnInit {
     } else {
       this.subscribeToSaveResponse(this.historiaClinicaService.create(historiaClinica));
     }
+  }*/
+  save(): void {
+    this.isSaving = true;
+    const historiaClinica = this.historiaClinicaFormService.getHistoriaClinica(this.editForm);
+
+    // Llamar al endpoint GraphQL para obtener el hash
+    this.getBlockchainHash(historiaClinica).subscribe({
+      next: hash => {
+        // Asignar el hash obtenido
+        historiaClinica.hashBlockchain = hash;
+
+        // Continuar con el guardado
+        if (historiaClinica.id !== null) {
+          this.subscribeToSaveResponse(this.historiaClinicaService.update(historiaClinica));
+        } else {
+          this.subscribeToSaveResponse(this.historiaClinicaService.create(historiaClinica));
+        }
+      },
+      error: error => {
+        console.error('Error al obtener hash de blockchain:', error);
+        this.onSaveError();
+      },
+    });
+  }
+
+  protected getBlockchainHash(historiaClinica: IHistoriaClinica | NewHistoriaClinica): Observable<string> {
+    const endpoint = 'https://smartcontractmicroservice-production.up.railway.app/graphql';
+
+    // Formatear la fecha para la consulta GraphQL (YYYY-MM-DD)
+    const fecha = historiaClinica.fecha ? historiaClinica.fecha.format('YYYY-MM-DD') : '';
+
+    // Construir la consulta GraphQL
+    const graphqlQuery = {
+      query: `
+        mutation {
+          registrarHistoria(
+            fecha: "${fecha}"
+            sintomas: "${historiaClinica.sintomas || ''}"
+            diagnostico: "${historiaClinica.diagnostico || ''}"
+            tratamiento: "${historiaClinica.tratamiento || ''}"
+          )
+        }
+      `,
+    };
+
+    const headers = new HttpHeaders().set('Content-Type', 'application/json');
+
+    // Realizar la llamada al endpoint GraphQL
+    return this.http.post(endpoint, graphqlQuery, { headers }).pipe(
+      map((response: any) => {
+        // Extraer el hash del resultado
+        return response.data.registrarHistoria;
+      }),
+    );
   }
 
   protected subscribeToSaveResponse(result: Observable<HttpResponse<IHistoriaClinica>>): void {
