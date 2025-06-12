@@ -15,6 +15,7 @@ import { DEFAULT_SORT_DATA, ITEM_DELETED_EVENT, SORT } from 'app/config/navigati
 import { IReporte } from '../reporte.model';
 import { EntityArrayResponseType, ReporteService } from '../service/reporte.service';
 import { ReporteDeleteDialogComponent } from '../delete/reporte-delete-dialog.component';
+import { ReporteGraphQLService } from '../service/reporte-graphql.service';
 
 @Component({
   selector: 'jhi-reporte',
@@ -38,6 +39,7 @@ export class ReporteComponent implements OnInit {
   protected readonly sortService = inject(SortService);
   protected modalService = inject(NgbModal);
   protected ngZone = inject(NgZone);
+  protected readonly reporteGraphQLService = inject(ReporteGraphQLService);
 
   trackId = (item: IReporte): number => this.reporteService.getReporteIdentifier(item);
 
@@ -57,7 +59,13 @@ export class ReporteComponent implements OnInit {
     modalRef.closed
       .pipe(
         filter(reason => reason === ITEM_DELETED_EVENT),
-        tap(() => this.load()),
+        tap(() => {
+          if (reporte.id) {
+            this.reporteGraphQLService.delete(reporte.id).subscribe(() => {
+              this.load();
+            });
+          }
+        }),
       )
       .subscribe();
   }
@@ -108,7 +116,7 @@ export class ReporteComponent implements OnInit {
       size: this.itemsPerPage,
       sort: this.sortService.buildSortParam(this.sortState()),
     };
-    return this.reporteService.query(queryObject).pipe(tap(() => (this.isLoading = false)));
+    return this.reporteGraphQLService.query(queryObject).pipe(tap(() => (this.isLoading = false)));
   }
 
   protected handleNavigation(page: number, sortState: SortState): void {

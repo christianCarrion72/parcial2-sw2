@@ -6,6 +6,7 @@ import SharedModule from 'app/shared/shared.module';
 import { ITEM_DELETED_EVENT } from 'app/config/navigation.constants';
 import { IPaciente } from '../paciente.model';
 import { PacienteService } from '../service/paciente.service';
+import { PacienteGraphQLService } from '../service/paciente-graphql.service';
 
 @Component({
   templateUrl: './paciente-delete-dialog.component.html',
@@ -14,7 +15,8 @@ import { PacienteService } from '../service/paciente.service';
 export class PacienteDeleteDialogComponent {
   paciente?: IPaciente;
 
-  protected pacienteService = inject(PacienteService);
+  //protected pacienteService = inject(PacienteService);
+  protected pacienteGraphQLService = inject(PacienteGraphQLService);
   protected activeModal = inject(NgbActiveModal);
 
   cancel(): void {
@@ -22,7 +24,7 @@ export class PacienteDeleteDialogComponent {
   }
 
   confirmDelete(id: number): void {
-    this.pacienteService.delete(id).subscribe(() => {
+    this.pacienteGraphQLService.delete(id).subscribe(() => {
       this.activeModal.close(ITEM_DELETED_EVENT);
     });
   }

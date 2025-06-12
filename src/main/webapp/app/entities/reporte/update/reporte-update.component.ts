@@ -2,7 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import { finalize } from 'rxjs/operators';
+import { finalize, timeout } from 'rxjs/operators';
 
 import SharedModule from 'app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -10,6 +10,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { IReporte } from '../reporte.model';
 import { ReporteService } from '../service/reporte.service';
 import { ReporteFormGroup, ReporteFormService } from './reporte-form.service';
+import { ReporteGraphQLService } from '../service/reporte-graphql.service';
 
 @Component({
   selector: 'jhi-reporte-update',
@@ -23,6 +24,7 @@ export class ReporteUpdateComponent implements OnInit {
   protected reporteService = inject(ReporteService);
   protected reporteFormService = inject(ReporteFormService);
   protected activatedRoute = inject(ActivatedRoute);
+  protected reporteGraphQLService = inject(ReporteGraphQLService);
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   editForm: ReporteFormGroup = this.reporteFormService.createReporteFormGroup();
@@ -31,7 +33,11 @@ export class ReporteUpdateComponent implements OnInit {
     this.activatedRoute.data.subscribe(({ reporte }) => {
       this.reporte = reporte;
       if (reporte) {
+        console.log('Editando reporte:', reporte);
         this.updateForm(reporte);
+      } else {
+        console.log('Creando nuevo reporte:');
+        this.editForm = this.reporteFormService.createReporteFormGroup();
       }
     });
   }
@@ -40,7 +46,7 @@ export class ReporteUpdateComponent implements OnInit {
     window.history.back();
   }
 
-  save(): void {
+  /*save(): void {
     this.isSaving = true;
     const reporte = this.reporteFormService.getReporte(this.editForm);
     if (reporte.id !== null) {
@@ -55,6 +61,36 @@ export class ReporteUpdateComponent implements OnInit {
       next: () => this.onSaveSuccess(),
       error: () => this.onSaveError(),
     });
+  }*/
+
+  save(): void {
+    this.isSaving = true;
+    const reporte = this.reporteFormService.getReporte(this.editForm);
+    if (reporte.id !== null) {
+      this.subscribeToGraphQLResponse(this.reporteGraphQLService.update(reporte));
+    } else {
+      this.subscribeToGraphQLResponse(this.reporteGraphQLService.create(reporte));
+    }
+  }
+
+  protected subscribeToGraphQLResponse(result: Observable<IReporte>): void {
+    result
+      .pipe(
+        finalize(() => {
+          this.isSaving = false;
+        }),
+        timeout(30000), // 30 segundos de timeout
+      )
+      .subscribe({
+        next: response => {
+          console.log('Respuesta GraphQL exitosa:', response);
+          this.onSaveSuccess();
+        },
+        error: error => {
+          console.error('Error GraphQL:', error);
+          this.onSaveSuccess(); // Redirigir incluso con error
+        },
+      });
   }
 
   protected onSaveSuccess(): void {

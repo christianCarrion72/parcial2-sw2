@@ -15,6 +15,7 @@ import { DEFAULT_SORT_DATA, ITEM_DELETED_EVENT, SORT } from 'app/config/navigati
 import { ICita } from '../cita.model';
 import { CitaService, EntityArrayResponseType } from '../service/cita.service';
 import { CitaDeleteDialogComponent } from '../delete/cita-delete-dialog.component';
+import { CitaGraphQLService } from '../service/cita-graphql.service';
 
 @Component({
   selector: 'jhi-cita',
@@ -38,6 +39,7 @@ export class CitaComponent implements OnInit {
   protected readonly sortService = inject(SortService);
   protected modalService = inject(NgbModal);
   protected ngZone = inject(NgZone);
+  protected readonly citaGraphQLService = inject(CitaGraphQLService);
 
   trackId = (item: ICita): number => this.citaService.getCitaIdentifier(item);
 
@@ -57,7 +59,13 @@ export class CitaComponent implements OnInit {
     modalRef.closed
       .pipe(
         filter(reason => reason === ITEM_DELETED_EVENT),
-        tap(() => this.load()),
+        tap(() => {
+          if (cita.id) {
+            this.citaGraphQLService.delete(cita.id).subscribe(() => {
+              this.load();
+            });
+          }
+        }),
       )
       .subscribe();
   }
@@ -109,7 +117,7 @@ export class CitaComponent implements OnInit {
       eagerload: true,
       sort: this.sortService.buildSortParam(this.sortState()),
     };
-    return this.citaService.query(queryObject).pipe(tap(() => (this.isLoading = false)));
+    return this.citaGraphQLService.query(queryObject).pipe(tap(() => (this.isLoading = false)));
   }
 
   protected handleNavigation(page: number, sortState: SortState): void {

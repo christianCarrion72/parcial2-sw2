@@ -14,6 +14,7 @@ import { DEFAULT_SORT_DATA, ITEM_DELETED_EVENT, SORT } from 'app/config/navigati
 import { IEspecialidad } from '../especialidad.model';
 import { EntityArrayResponseType, EspecialidadService } from '../service/especialidad.service';
 import { EspecialidadDeleteDialogComponent } from '../delete/especialidad-delete-dialog.component';
+import { EspecialidadGraphQLService } from '../service/especialidad-graphql.service';
 
 @Component({
   selector: 'jhi-especialidad',
@@ -37,6 +38,7 @@ export class EspecialidadComponent implements OnInit {
   protected readonly sortService = inject(SortService);
   protected modalService = inject(NgbModal);
   protected ngZone = inject(NgZone);
+  private readonly especialidadGraphQLService = inject(EspecialidadGraphQLService);
 
   trackId = (item: IEspecialidad): number => this.especialidadService.getEspecialidadIdentifier(item);
 
@@ -56,7 +58,13 @@ export class EspecialidadComponent implements OnInit {
     modalRef.closed
       .pipe(
         filter(reason => reason === ITEM_DELETED_EVENT),
-        tap(() => this.load()),
+        tap(() => {
+          if (especialidad.id) {
+            this.especialidadGraphQLService.delete(especialidad.id).subscribe(() => {
+              this.load();
+            });
+          }
+        }),
       )
       .subscribe();
   }
@@ -102,19 +110,21 @@ export class EspecialidadComponent implements OnInit {
 
     this.isLoading = true;
     const pageToLoad: number = page;
+    const sortParam = this.sortService.buildSortParam(this.sortState());
     const queryObject: any = {
       page: pageToLoad - 1,
       size: this.itemsPerPage,
-      sort: this.sortService.buildSortParam(this.sortState()),
+      sort: Array.isArray(sortParam) ? sortParam.join(',') : sortParam, // Convertir a string si es un array
     };
-    return this.especialidadService.query(queryObject).pipe(tap(() => (this.isLoading = false)));
+    return this.especialidadGraphQLService.query(queryObject).pipe(tap(() => (this.isLoading = false)));
   }
 
   protected handleNavigation(page: number, sortState: SortState): void {
+    const sortParam = this.sortService.buildSortParam(sortState);
     const queryParamsObj = {
       page,
       size: this.itemsPerPage,
-      sort: this.sortService.buildSortParam(sortState),
+      sort: Array.isArray(sortParam) ? sortParam.join(',') : sortParam, // Convertir a string si es un array
     };
 
     this.ngZone.run(() => {

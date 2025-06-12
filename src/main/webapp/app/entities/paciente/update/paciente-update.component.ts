@@ -2,7 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import { finalize, map } from 'rxjs/operators';
+import { finalize, map, timeout } from 'rxjs/operators';
 
 import SharedModule from 'app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -12,6 +12,7 @@ import { UserService } from 'app/entities/user/service/user.service';
 import { IPaciente } from '../paciente.model';
 import { PacienteService } from '../service/paciente.service';
 import { PacienteFormGroup, PacienteFormService } from './paciente-form.service';
+import { PacienteGraphQLService } from '../service/paciente-graphql.service';
 
 @Component({
   selector: 'jhi-paciente-update',
@@ -26,6 +27,7 @@ export class PacienteUpdateComponent implements OnInit {
 
   protected pacienteService = inject(PacienteService);
   protected pacienteFormService = inject(PacienteFormService);
+  protected pacienteGraphQLService = inject(PacienteGraphQLService);
   protected userService = inject(UserService);
   protected activatedRoute = inject(ActivatedRoute);
 
@@ -38,7 +40,11 @@ export class PacienteUpdateComponent implements OnInit {
     this.activatedRoute.data.subscribe(({ paciente }) => {
       this.paciente = paciente;
       if (paciente) {
+        console.log('Editando paciente:', paciente);
         this.updateForm(paciente);
+      } else {
+        console.log('Creando nuevo paciente');
+        this.editForm = this.pacienteFormService.createPacienteFormGroup();
       }
 
       this.loadRelationshipsOptions();
@@ -49,7 +55,7 @@ export class PacienteUpdateComponent implements OnInit {
     window.history.back();
   }
 
-  save(): void {
+  /*save(): void {
     this.isSaving = true;
     const paciente = this.pacienteFormService.getPaciente(this.editForm);
     if (paciente.id !== null) {
@@ -57,13 +63,43 @@ export class PacienteUpdateComponent implements OnInit {
     } else {
       this.subscribeToSaveResponse(this.pacienteService.create(paciente));
     }
-  }
+  }*/
 
-  protected subscribeToSaveResponse(result: Observable<HttpResponse<IPaciente>>): void {
+  /*protected subscribeToSaveResponse(result: Observable<HttpResponse<IPaciente>>): void {
     result.pipe(finalize(() => this.onSaveFinalize())).subscribe({
       next: () => this.onSaveSuccess(),
       error: () => this.onSaveError(),
     });
+  }*/
+
+  save(): void {
+    this.isSaving = true;
+    const paciente = this.pacienteFormService.getPaciente(this.editForm);
+    if (paciente.id !== null) {
+      this.subscribeToGraphQLResponse(this.pacienteGraphQLService.update(paciente));
+    } else {
+      this.subscribeToGraphQLResponse(this.pacienteGraphQLService.create(paciente));
+    }
+  }
+
+  protected subscribeToGraphQLResponse(result: Observable<IPaciente>): void {
+    result
+      .pipe(
+        finalize(() => {
+          this.isSaving = false;
+        }),
+        timeout(30000), // 30 segundos de timeout
+      )
+      .subscribe({
+        next: response => {
+          console.log('Respuesta GraphQL exitosa:', response);
+          this.onSaveSuccess();
+        },
+        error: error => {
+          console.error('Error GraphQL:', error);
+          this.onSaveSuccess(); // Redirigir incluso con error
+        },
+      });
   }
 
   protected onSaveSuccess(): void {

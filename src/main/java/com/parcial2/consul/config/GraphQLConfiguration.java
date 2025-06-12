@@ -3,6 +3,7 @@ package com.parcial2.consul.config;
 import graphql.ExecutionInput;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
+import graphql.scalars.ExtendedScalars;
 import java.util.Map;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,7 +20,8 @@ public class GraphQLConfiguration {
     @Bean
     public RuntimeWiringConfigurer runtimeWiringConfigurer() {
         return wiringBuilder -> {
-            // Aquí puedes configurar tipos personalizados, directivas, etc.
+            wiringBuilder.scalar(ExtendedScalars.DateTime); // Añadir soporte para fechas
+            wiringBuilder.scalar(ExtendedScalars.Time); // Añadir soporte para tiempo
         };
     }
 

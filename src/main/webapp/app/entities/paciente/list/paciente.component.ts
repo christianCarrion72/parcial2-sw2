@@ -15,6 +15,7 @@ import { DEFAULT_SORT_DATA, ITEM_DELETED_EVENT, SORT } from 'app/config/navigati
 import { IPaciente } from '../paciente.model';
 import { EntityArrayResponseType, PacienteService } from '../service/paciente.service';
 import { PacienteDeleteDialogComponent } from '../delete/paciente-delete-dialog.component';
+import { PacienteGraphQLService } from '../service/paciente-graphql.service';
 
 @Component({
   selector: 'jhi-paciente',
@@ -38,6 +39,7 @@ export class PacienteComponent implements OnInit {
   protected readonly sortService = inject(SortService);
   protected modalService = inject(NgbModal);
   protected ngZone = inject(NgZone);
+  protected readonly pacienteGraphQLService = inject(PacienteGraphQLService);
 
   trackId = (item: IPaciente): number => this.pacienteService.getPacienteIdentifier(item);
 
@@ -57,7 +59,13 @@ export class PacienteComponent implements OnInit {
     modalRef.closed
       .pipe(
         filter(reason => reason === ITEM_DELETED_EVENT),
-        tap(() => this.load()),
+        tap(() => {
+          if (paciente.id) {
+            this.pacienteGraphQLService.delete(paciente.id).subscribe(() => {
+              this.load();
+            });
+          }
+        }),
       )
       .subscribe();
   }
@@ -109,7 +117,7 @@ export class PacienteComponent implements OnInit {
       eagerload: true,
       sort: this.sortService.buildSortParam(this.sortState()),
     };
-    return this.pacienteService.query(queryObject).pipe(tap(() => (this.isLoading = false)));
+    return this.pacienteGraphQLService.query(queryObject).pipe(tap(() => (this.isLoading = false)));
   }
 
   protected handleNavigation(page: number, sortState: SortState): void {

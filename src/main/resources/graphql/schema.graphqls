@@ -1,3 +1,5 @@
+scalar DateTime
+
 type User {
     id: ID
     login: String!
@@ -29,7 +31,7 @@ input UserInput {
 # Definición del tipo Medico
 type Medico {
     id: ID
-    matricula: String!
+    matricula: String
     user: User
     especialidades: [Especialidad]
 }
@@ -39,14 +41,121 @@ type Especialidad {
     id: ID
     nombre: String
     descripcion: String
+    medicos: [Medico]
+}
+
+# Definición del tipo Paciente
+type Paciente {
+    id: ID
+    nroHistoriaClinica: String
+    fechaNacimiento: String
+    direccion: String
+    telefono: String
+    user: User
+}
+
+# Definición del tipo HorarioAtencion
+type HorarioAtencion {
+    id: ID
+    diaSemana: String
+    horaInicio: String
+    horaFin: String
+    medico: Medico
+}
+
+# Definición del tipo HistoriaClinica
+type HistoriaClinica {
+    id: ID
+    fecha: String
+    sintomas: String
+    diagnostico: String
+    tratamiento: String
+    hashBlockchain: String
+    paciente: Paciente
+}
+
+# Definición del tipo Cita
+type Cita {
+    id: ID!
+    fechaHora: DateTime!
+    estado: String!
+    confirmada: Boolean
+    paciente: Paciente
+    medico: Medico
+    horario: HorarioAtencion
+}
+
+# Definición del tipo Reporte
+type Reporte {
+    id: ID
+    tipo: String
+    fechaGeneracion: String
+    rutaArchivo: String
 }
 
 # Input para crear/actualizar Medico
 input MedicoInput {
     id: ID
-    matricula: String!
+    matricula: String
     userId: ID
     especialidadesIds: [ID]
+}
+
+# Input para crear/actualizar Especialidad
+input EspecialidadInput {
+    id: ID
+    nombre: String!
+    descripcion: String
+    medicosIds: [ID]
+}
+
+# Input para crear/actualizar Paciente
+input PacienteInput {
+    id: ID
+    nroHistoriaClinica: String!
+    fechaNacimiento: String
+    direccion: String
+    telefono: String
+    userId: ID
+}
+
+# Input para crear/actualizar HorarioAtencion
+input HorarioAtencionInput {
+    id: ID
+    diaSemana: String!
+    horaInicio: String!
+    horaFin: String!
+    medicoId: ID
+}
+
+# Input para crear/actualizar HistoriaClinica
+input HistoriaClinicaInput {
+    id: ID
+    fecha: String!
+    sintomas: String
+    diagnostico: String
+    tratamiento: String
+    hashBlockchain: String
+    pacienteId: ID
+}
+
+# Input para crear/actualizar Cita
+input CitaInput {
+    id: ID
+    fechaHora: String!
+    estado: String!
+    confirmada: Boolean
+    pacienteId: ID
+    medicoId: ID
+    horarioId: ID
+}
+
+# Input para crear/actualizar Reporte
+input ReporteInput {
+    id: ID
+    tipo: String!
+    fechaGeneracion: String!
+    rutaArchivo: String!
 }
 
 type Query {
@@ -57,6 +166,30 @@ type Query {
     # Queries para Medico
     getMedicoById(id: ID!): Medico
     getAllMedicos(page: Int, size: Int, sort: String, eagerload: Boolean): [Medico!]!
+
+    # Queries para Especialidad
+    getEspecialidadById(id: ID!): Especialidad
+    getAllEspecialidades(page: Int, size: Int, sort: String): [Especialidad!]!
+
+    # Queries para Paciente
+    getPacienteById(id: ID!): Paciente
+    getAllPacientes(page: Int, size: Int, sort: String, eagerload: Boolean): [Paciente!]!
+
+    # Queries para HorarioAtencion
+    getHorarioAtencionById(id: ID!): HorarioAtencion
+    getAllHorariosAtencion(page: Int, size: Int, sort: String, eagerload: Boolean): [HorarioAtencion!]!
+    
+    # Queries para HistoriaClinica
+    getHistoriaClinicaById(id: ID!): HistoriaClinica
+    getAllHistoriasClinicas(page: Int, size: Int, sort: String, eagerload: Boolean): [HistoriaClinica!]!
+    
+    # Queries para Cita
+    getCitaById(id: ID!): Cita
+    getAllCitas(page: Int, size: Int, sort: String, eagerload: Boolean): [Cita!]!
+    
+    # Queries para Reporte
+    getReporteById(id: ID!): Reporte
+    getAllReportes(page: Int, size: Int, sort: String): [Reporte!]!
 }
 
 type Mutation {
@@ -69,4 +202,34 @@ type Mutation {
     createMedico(medicoInput: MedicoInput!): Medico
     updateMedico(id: ID!, medicoInput: MedicoInput!): Medico
     deleteMedico(id: ID!): Boolean
+
+    # Mutations para Especialidad
+    createEspecialidad(especialidadInput: EspecialidadInput!): Especialidad
+    updateEspecialidad(id: ID!, especialidadInput: EspecialidadInput!): Especialidad
+    deleteEspecialidad(id: ID!): Boolean
+
+    # Mutations para Paciente
+    createPaciente(pacienteInput: PacienteInput!): Paciente
+    updatePaciente(id: ID!, pacienteInput: PacienteInput!): Paciente
+    deletePaciente(id: ID!): Boolean
+
+    # Mutations para HorarioAtencion
+    createHorarioAtencion(horarioInput: HorarioAtencionInput!): HorarioAtencion
+    updateHorarioAtencion(id: ID!, horarioInput: HorarioAtencionInput!): HorarioAtencion
+    deleteHorarioAtencion(id: ID!): Boolean
+    
+    # Mutations para HistoriaClinica
+    createHistoriaClinica(historiaInput: HistoriaClinicaInput!): HistoriaClinica
+    updateHistoriaClinica(id: ID!, historiaInput: HistoriaClinicaInput!): HistoriaClinica
+    deleteHistoriaClinica(id: ID!): Boolean
+    
+    # Mutations para Cita
+    createCita(citaInput: CitaInput!): Cita
+    updateCita(id: ID!, citaInput: CitaInput!): Cita
+    deleteCita(id: ID!): Boolean
+    
+    # Mutations para Reporte
+    createReporte(reporteInput: ReporteInput!): Reporte
+    updateReporte(id: ID!, reporteInput: ReporteInput!): Reporte
+    deleteReporte(id: ID!): Boolean
 }

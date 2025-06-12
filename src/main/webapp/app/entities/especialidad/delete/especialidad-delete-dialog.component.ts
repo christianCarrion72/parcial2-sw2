@@ -6,6 +6,7 @@ import SharedModule from 'app/shared/shared.module';
 import { ITEM_DELETED_EVENT } from 'app/config/navigation.constants';
 import { IEspecialidad } from '../especialidad.model';
 import { EspecialidadService } from '../service/especialidad.service';
+import { EspecialidadGraphQLService } from '../service/especialidad-graphql.service';
 
 @Component({
   templateUrl: './especialidad-delete-dialog.component.html',
@@ -14,7 +15,8 @@ import { EspecialidadService } from '../service/especialidad.service';
 export class EspecialidadDeleteDialogComponent {
   especialidad?: IEspecialidad;
 
-  protected especialidadService = inject(EspecialidadService);
+  //protected especialidadService = inject(EspecialidadService);
+  protected especialidadGraphQLService = inject(EspecialidadGraphQLService);
   protected activeModal = inject(NgbActiveModal);
 
   cancel(): void {
@@ -22,7 +24,7 @@ export class EspecialidadDeleteDialogComponent {
   }
 
   confirmDelete(id: number): void {
-    this.especialidadService.delete(id).subscribe(() => {
+    this.especialidadGraphQLService.delete(id).subscribe(() => {
       this.activeModal.close(ITEM_DELETED_EVENT);
     });
   }

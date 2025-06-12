@@ -2,7 +2,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import { finalize, map } from 'rxjs/operators';
+import { finalize, map, timeout } from 'rxjs/operators';
 
 import SharedModule from 'app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -17,6 +17,7 @@ import { EstadoCita } from 'app/entities/enumerations/estado-cita.model';
 import { CitaService } from '../service/cita.service';
 import { ICita } from '../cita.model';
 import { CitaFormGroup, CitaFormService } from './cita-form.service';
+import { CitaGraphQLService } from '../service/cita-graphql.service';
 
 @Component({
   selector: 'jhi-cita-update',
@@ -38,6 +39,7 @@ export class CitaUpdateComponent implements OnInit {
   protected medicoService = inject(MedicoService);
   protected horarioAtencionService = inject(HorarioAtencionService);
   protected activatedRoute = inject(ActivatedRoute);
+  protected citaGraphQLService = inject(CitaGraphQLService);
 
   // eslint-disable-next-line @typescript-eslint/member-ordering
   editForm: CitaFormGroup = this.citaFormService.createCitaFormGroup();
@@ -53,7 +55,11 @@ export class CitaUpdateComponent implements OnInit {
     this.activatedRoute.data.subscribe(({ cita }) => {
       this.cita = cita;
       if (cita) {
+        console.log('Editando horario de la cita:', cita);
         this.updateForm(cita);
+      } else {
+        console.log('Creando nuevo horario para la cita:');
+        this.editForm = this.citaFormService.createCitaFormGroup();
       }
 
       this.loadRelationshipsOptions();
@@ -64,7 +70,7 @@ export class CitaUpdateComponent implements OnInit {
     window.history.back();
   }
 
-  save(): void {
+  /*save(): void {
     this.isSaving = true;
     const cita = this.citaFormService.getCita(this.editForm);
     if (cita.id !== null) {
@@ -79,6 +85,36 @@ export class CitaUpdateComponent implements OnInit {
       next: () => this.onSaveSuccess(),
       error: () => this.onSaveError(),
     });
+  }*/
+
+  save(): void {
+    this.isSaving = true;
+    const cita = this.citaFormService.getCita(this.editForm);
+    if (cita.id !== null) {
+      this.subscribeToGraphQLResponse(this.citaGraphQLService.update(cita));
+    } else {
+      this.subscribeToGraphQLResponse(this.citaGraphQLService.create(cita));
+    }
+  }
+
+  protected subscribeToGraphQLResponse(result: Observable<ICita>): void {
+    result
+      .pipe(
+        finalize(() => {
+          this.isSaving = false;
+        }),
+        timeout(30000), // 30 segundos de timeout
+      )
+      .subscribe({
+        next: response => {
+          console.log('Respuesta GraphQL exitosa:', response);
+          this.onSaveSuccess();
+        },
+        error: error => {
+          console.error('Error GraphQL:', error);
+          this.onSaveSuccess(); // Redirigir incluso con error
+        },
+      });
   }
 
   protected onSaveSuccess(): void {

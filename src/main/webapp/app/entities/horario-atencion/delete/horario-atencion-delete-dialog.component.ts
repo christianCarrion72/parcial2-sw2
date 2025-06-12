@@ -6,6 +6,7 @@ import SharedModule from 'app/shared/shared.module';
 import { ITEM_DELETED_EVENT } from 'app/config/navigation.constants';
 import { IHorarioAtencion } from '../horario-atencion.model';
 import { HorarioAtencionService } from '../service/horario-atencion.service';
+import { HorarioAtencionGraphQLService } from '../service/horario-atencion-graphql.service';
 
 @Component({
   templateUrl: './horario-atencion-delete-dialog.component.html',
@@ -14,7 +15,7 @@ import { HorarioAtencionService } from '../service/horario-atencion.service';
 export class HorarioAtencionDeleteDialogComponent {
   horarioAtencion?: IHorarioAtencion;
 
-  protected horarioAtencionService = inject(HorarioAtencionService);
+  protected horarioAtencionGraphQLService = inject(HorarioAtencionGraphQLService);
   protected activeModal = inject(NgbActiveModal);
 
   cancel(): void {
@@ -22,7 +23,7 @@ export class HorarioAtencionDeleteDialogComponent {
   }
 
   confirmDelete(id: number): void {
-    this.horarioAtencionService.delete(id).subscribe(() => {
+    this.horarioAtencionGraphQLService.delete(id).subscribe(() => {
       this.activeModal.close(ITEM_DELETED_EVENT);
     });
   }

@@ -14,6 +14,7 @@ import { DEFAULT_SORT_DATA, ITEM_DELETED_EVENT, SORT } from 'app/config/navigati
 import { IHorarioAtencion } from '../horario-atencion.model';
 import { EntityArrayResponseType, HorarioAtencionService } from '../service/horario-atencion.service';
 import { HorarioAtencionDeleteDialogComponent } from '../delete/horario-atencion-delete-dialog.component';
+import { HorarioAtencionGraphQLService } from '../service/horario-atencion-graphql.service';
 
 @Component({
   selector: 'jhi-horario-atencion',
@@ -37,6 +38,7 @@ export class HorarioAtencionComponent implements OnInit {
   protected readonly sortService = inject(SortService);
   protected modalService = inject(NgbModal);
   protected ngZone = inject(NgZone);
+  protected readonly horarioAtencionGraphQLService = inject(HorarioAtencionGraphQLService);
 
   trackId = (item: IHorarioAtencion): number => this.horarioAtencionService.getHorarioAtencionIdentifier(item);
 
@@ -56,7 +58,13 @@ export class HorarioAtencionComponent implements OnInit {
     modalRef.closed
       .pipe(
         filter(reason => reason === ITEM_DELETED_EVENT),
-        tap(() => this.load()),
+        tap(() => {
+          if (horarioAtencion.id) {
+            this.horarioAtencionGraphQLService.delete(horarioAtencion.id).subscribe(() => {
+              this.load();
+            });
+          }
+        }),
       )
       .subscribe();
   }
@@ -108,7 +116,7 @@ export class HorarioAtencionComponent implements OnInit {
       eagerload: true,
       sort: this.sortService.buildSortParam(this.sortState()),
     };
-    return this.horarioAtencionService.query(queryObject).pipe(tap(() => (this.isLoading = false)));
+    return this.horarioAtencionGraphQLService.query(queryObject).pipe(tap(() => (this.isLoading = false)));
   }
 
   protected handleNavigation(page: number, sortState: SortState): void {

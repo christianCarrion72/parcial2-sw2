@@ -20,6 +20,9 @@ public interface CitaMapper extends EntityMapper<CitaDTO, Cita> {
     @Mapping(target = "horario", source = "horario", qualifiedByName = "horarioAtencionId")
     CitaDTO toDto(Cita s);
 
+    @Mapping(target = "horario.medico.removeEspecialidades", ignore = true)
+    Cita toEntity(CitaDTO citaDTO);
+
     @Named("pacienteNroHistoriaClinica")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")

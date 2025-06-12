@@ -6,6 +6,7 @@ import SharedModule from 'app/shared/shared.module';
 import { ITEM_DELETED_EVENT } from 'app/config/navigation.constants';
 import { ICita } from '../cita.model';
 import { CitaService } from '../service/cita.service';
+import { CitaGraphQLService } from '../service/cita-graphql.service';
 
 @Component({
   templateUrl: './cita-delete-dialog.component.html',
@@ -14,7 +15,7 @@ import { CitaService } from '../service/cita.service';
 export class CitaDeleteDialogComponent {
   cita?: ICita;
 
-  protected citaService = inject(CitaService);
+  protected citaGraphQLService = inject(CitaGraphQLService);
   protected activeModal = inject(NgbActiveModal);
 
   cancel(): void {
@@ -22,7 +23,7 @@ export class CitaDeleteDialogComponent {
   }
 
   confirmDelete(id: number): void {
-    this.citaService.delete(id).subscribe(() => {
+    this.citaGraphQLService.delete(id).subscribe(() => {
       this.activeModal.close(ITEM_DELETED_EVENT);
     });
   }

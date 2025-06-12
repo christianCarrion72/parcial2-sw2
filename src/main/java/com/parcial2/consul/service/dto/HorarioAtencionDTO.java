@@ -18,10 +18,10 @@ public class HorarioAtencionDTO implements Serializable {
     private DiaSemana diaSemana;
 
     @NotNull
-    private LocalTime horaInicio;
+    private String horaInicio;
 
     @NotNull
-    private LocalTime horaFin;
+    private String horaFin;
 
     private MedicoDTO medico;
 
@@ -37,23 +37,28 @@ public class HorarioAtencionDTO implements Serializable {
         return diaSemana;
     }
 
-    public void setDiaSemana(DiaSemana diaSemana) {
-        this.diaSemana = diaSemana;
+    public void setDiaSemana(String diaSemana) {
+        // Convertir el string a enum DiaSemana
+        try {
+            this.diaSemana = DiaSemana.valueOf(diaSemana);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Día de semana inválido: " + diaSemana);
+        }
     }
 
-    public LocalTime getHoraInicio() {
+    public @NotNull String getHoraInicio() {
         return horaInicio;
     }
 
-    public void setHoraInicio(LocalTime horaInicio) {
+    public void setHoraInicio(String horaInicio) {
         this.horaInicio = horaInicio;
     }
 
-    public LocalTime getHoraFin() {
+    public @NotNull String getHoraFin() {
         return horaFin;
     }
 
-    public void setHoraFin(LocalTime horaFin) {
+    public void setHoraFin(String horaFin) {
         this.horaFin = horaFin;
     }
 
