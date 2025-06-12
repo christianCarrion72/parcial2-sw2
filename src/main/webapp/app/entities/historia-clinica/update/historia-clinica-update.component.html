@@ -51,6 +51,11 @@
         <div class="mb-3">
           <label class="form-label" for="field_sintomas" jhiTranslate="parcial2Sw2MApp.historiaClinica.sintomas">Sintomas</label>
           <textarea class="form-control" name="sintomas" id="field_sintomas" data-cy="sintomas" formControlName="sintomas"></textarea>
+          <div class="mt-2">
+            <button type="button" class="btn btn-info" (click)="consultarPrediccion()">
+              <fa-icon icon="search"></fa-icon>&nbsp;<span>Sugerir diagnóstico</span>
+            </button>
+          </div>
         </div>
 
         <div class="mb-3">

@@ -7,6 +7,13 @@ function setupProxy({ tls }) {
       secure: false,
       changeOrigin: tls,
     },
+    {
+      context: ['/prediccion-api'],
+      target: 'https://enfermedades-ml.fly.dev',
+      pathRewrite: { '^/prediccion-api': '/graphql' }, // Redirige a /graphql para que la URL final sea /graphql/graphql
+      secure: false,
+      changeOrigin: true,
+    },
   ];
 }
 

@@ -15,6 +15,8 @@ import { PacienteService } from 'app/entities/paciente/service/paciente.service'
 import { HistoriaClinicaService } from '../service/historia-clinica.service';
 import { IHistoriaClinica, NewHistoriaClinica } from '../historia-clinica.model';
 import { HistoriaClinicaFormGroup, HistoriaClinicaFormService } from './historia-clinica-form.service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { PrediccionModalComponent } from './prediccion-modal.component';
 
 @Component({
   selector: 'jhi-historia-clinica-update',
@@ -30,6 +32,7 @@ export class HistoriaClinicaUpdateComponent implements OnInit {
   protected http = inject(HttpClient);
   protected dataUtils = inject(DataUtils);
   protected eventManager = inject(EventManager);
+  protected modalService = inject(NgbModal);
   protected historiaClinicaService = inject(HistoriaClinicaService);
   protected historiaClinicaFormService = inject(HistoriaClinicaFormService);
   protected pacienteService = inject(PacienteService);
@@ -173,5 +176,71 @@ export class HistoriaClinicaUpdateComponent implements OnInit {
         ),
       )
       .subscribe((pacientes: IPaciente[]) => (this.pacientesSharedCollection = pacientes));
+  }
+
+  consultarPrediccion(): void {
+    const sintomas = this.editForm.get('sintomas')?.value || '';
+    const paciente = this.editForm.get('paciente')?.value;
+
+    if (!sintomas) {
+      this.eventManager.broadcast(
+        new EventWithContent<AlertError>('parcial2Sw2MApp.error', new AlertError('Debe ingresar síntomas para obtener una predicción')),
+      );
+      return;
+    }
+
+    if (!paciente) {
+      this.eventManager.broadcast(
+        new EventWithContent<AlertError>(
+          'parcial2Sw2MApp.error',
+          new AlertError('Debe seleccionar un paciente para obtener una predicción'),
+        ),
+      );
+      return;
+    }
+
+    const nroHistoriaClinica = paciente.nroHistoriaClinica || '';
+
+    // Construir la consulta GraphQL según la imagen proporcionada
+    const graphqlQuery = {
+      query: `
+        query {
+          predecir(
+            edad: 25,
+            sexo: "M",
+            sintomas: "${sintomas}"
+          ) {
+            enfermedad
+            recomendacion
+          }
+        }
+      `,
+    };
+
+    const headers = new HttpHeaders().set('Content-Type', 'application/json');
+
+    // Realizar la llamada al endpoint GraphQL
+    this.http.post('/prediccion-api/graphql', graphqlQuery, { headers }).subscribe({
+      next: (response: any) => {
+        if (response.data && response.data.predecir) {
+          this.mostrarPrediccion(response.data.predecir);
+        } else {
+          this.eventManager.broadcast(
+            new EventWithContent<AlertError>('parcial2Sw2MApp.error', new AlertError('No se pudo obtener una predicción')),
+          );
+        }
+      },
+      error: error => {
+        console.error('Error al obtener predicción:', error);
+        this.eventManager.broadcast(
+          new EventWithContent<AlertError>('parcial2Sw2MApp.error', new AlertError('Error al consultar el servicio de predicción')),
+        );
+      },
+    });
+  }
+
+  mostrarPrediccion(prediccion: any): void {
+    const modalRef = this.modalService.open(PrediccionModalComponent);
+    modalRef.componentInstance.prediccion = prediccion;
   }
 }
