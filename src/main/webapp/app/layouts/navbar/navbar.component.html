@@ -27,109 +27,169 @@
             </span>
           </a>
         </li>
+
         <!-- jhipster-needle-add-element-to-menu - JHipster will add new menu items here -->
         @if (account() !== null) {
-          <li
-            ngbDropdown
-            class="nav-item dropdown pointer"
-            display="dynamic"
-            routerLinkActive="active"
-            [routerLinkActiveOptions]="{ exact: true }"
-          >
-            <a class="nav-link dropdown-toggle" ngbDropdownToggle href="javascript:void(0);" id="entity-menu" data-cy="entity">
-              <span>
-                <fa-icon icon="th-list"></fa-icon>
-                <span jhiTranslate="global.menu.entities.main">Entidades</span>
-              </span>
-            </a>
-            <ul class="dropdown-menu" ngbDropdownMenu aria-labelledby="entity-menu">
-              <li>
-                <a
-                  class="dropdown-item"
-                  routerLink="/paciente"
-                  routerLinkActive="active"
-                  [routerLinkActiveOptions]="{ exact: true }"
-                  (click)="collapseNavbar()"
-                >
-                  <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
-                  <span jhiTranslate="global.menu.entities.paciente">Paciente</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  class="dropdown-item"
-                  routerLink="/medico"
-                  routerLinkActive="active"
-                  [routerLinkActiveOptions]="{ exact: true }"
-                  (click)="collapseNavbar()"
-                >
-                  <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
-                  <span jhiTranslate="global.menu.entities.medico">Medico</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  class="dropdown-item"
-                  routerLink="/especialidad"
-                  routerLinkActive="active"
-                  [routerLinkActiveOptions]="{ exact: true }"
-                  (click)="collapseNavbar()"
-                >
-                  <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
-                  <span jhiTranslate="global.menu.entities.especialidad">Especialidad</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  class="dropdown-item"
-                  routerLink="/cita"
-                  routerLinkActive="active"
-                  [routerLinkActiveOptions]="{ exact: true }"
-                  (click)="collapseNavbar()"
-                >
-                  <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
-                  <span jhiTranslate="global.menu.entities.cita">Cita</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  class="dropdown-item"
-                  routerLink="/historia-clinica"
-                  routerLinkActive="active"
-                  [routerLinkActiveOptions]="{ exact: true }"
-                  (click)="collapseNavbar()"
-                >
-                  <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
-                  <span jhiTranslate="global.menu.entities.historiaClinica">Historia Clinica</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  class="dropdown-item"
-                  routerLink="/reporte"
-                  routerLinkActive="active"
-                  [routerLinkActiveOptions]="{ exact: true }"
-                  (click)="collapseNavbar()"
-                >
-                  <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
-                  <span jhiTranslate="global.menu.entities.reporte">Reporte</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  class="dropdown-item"
-                  routerLink="/horario-atencion"
-                  routerLinkActive="active"
-                  [routerLinkActiveOptions]="{ exact: true }"
-                  (click)="collapseNavbar()"
-                >
-                  <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
-                  <span jhiTranslate="global.menu.entities.horarioAtencion">Horario Atencion</span>
-                </a>
-              </li>
-              <!-- jhipster-needle-add-entity-to-menu - JHipster will add entities to the menu here -->
-            </ul>
-          </li>
+          <!-- Solo para administradores: menú completo de entidades -->
+          @if (account() && account()?.authorities && account()?.authorities?.includes('ROLE_ADMIN')) {
+            <li
+              ngbDropdown
+              class="nav-item dropdown pointer"
+              display="dynamic"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+            >
+              <a class="nav-link dropdown-toggle" ngbDropdownToggle href="javascript:void(0);" id="entity-menu" data-cy="entity">
+                <span>
+                  <fa-icon icon="th-list"></fa-icon>
+                  <span jhiTranslate="global.menu.entities.main">Entidades</span>
+                </span>
+              </a>
+              <ul class="dropdown-menu" ngbDropdownMenu aria-labelledby="entity-menu">
+                <!-- Todos los elementos del menú de entidades -->
+                <li>
+                  <a
+                    class="dropdown-item"
+                    routerLink="/paciente"
+                    routerLinkActive="active"
+                    [routerLinkActiveOptions]="{ exact: true }"
+                    (click)="collapseNavbar()"
+                  >
+                    <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
+                    <span jhiTranslate="global.menu.entities.paciente">Paciente</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    routerLink="/medico"
+                    routerLinkActive="active"
+                    [routerLinkActiveOptions]="{ exact: true }"
+                    (click)="collapseNavbar()"
+                  >
+                    <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
+                    <span jhiTranslate="global.menu.entities.medico">Medico</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    routerLink="/especialidad"
+                    routerLinkActive="active"
+                    [routerLinkActiveOptions]="{ exact: true }"
+                    (click)="collapseNavbar()"
+                  >
+                    <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
+                    <span jhiTranslate="global.menu.entities.especialidad">Especialidad</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    routerLink="/cita"
+                    routerLinkActive="active"
+                    [routerLinkActiveOptions]="{ exact: true }"
+                    (click)="collapseNavbar()"
+                  >
+                    <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
+                    <span jhiTranslate="global.menu.entities.cita">Cita</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    routerLink="/historia-clinica"
+                    routerLinkActive="active"
+                    [routerLinkActiveOptions]="{ exact: true }"
+                    (click)="collapseNavbar()"
+                  >
+                    <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
+                    <span jhiTranslate="global.menu.entities.historiaClinica">Historia Clinica</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    routerLink="/reporte"
+                    routerLinkActive="active"
+                    [routerLinkActiveOptions]="{ exact: true }"
+                    (click)="collapseNavbar()"
+                  >
+                    <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
+                    <span jhiTranslate="global.menu.entities.reporte">Reporte</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    routerLink="/horario-atencion"
+                    routerLinkActive="active"
+                    [routerLinkActiveOptions]="{ exact: true }"
+                    (click)="collapseNavbar()"
+                  >
+                    <fa-icon icon="asterisk" [fixedWidth]="true"></fa-icon>
+                    <span jhiTranslate="global.menu.entities.horarioAtencion">Horario Atencion</span>
+                  </a>
+                </li>
+                <!-- jhipster-needle-add-entity-to-menu - JHipster will add entities to the menu here -->
+              </ul>
+            </li>
+          }
+
+          <!-- Para médicos: menú limitado (solo algunas entidades) -->
+          @if (
+            account() &&
+            account()?.authorities &&
+            account()?.authorities?.includes('ROLE_MEDICO') &&
+            !account()?.authorities?.includes('ROLE_ADMIN')
+          ) {
+            <li
+              ngbDropdown
+              class="nav-item dropdown pointer"
+              display="dynamic"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+            >
+              <a class="nav-link dropdown-toggle" ngbDropdownToggle href="javascript:void(0);" id="medico-menu" data-cy="medico">
+                <span>
+                  <fa-icon icon="stethoscope"></fa-icon>
+                  <span>Gestión Médica</span>
+                </span>
+              </a>
+              <ul class="dropdown-menu" ngbDropdownMenu aria-labelledby="medico-menu">
+                <li>
+                  <a class="dropdown-item" (click)="navigateToCitas()">
+                    <fa-icon icon="calendar" [fixedWidth]="true"></fa-icon>
+                    <span jhiTranslate="global.menu.entities.cita">Citas</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    routerLink="/historia-clinica"
+                    routerLinkActive="active"
+                    [routerLinkActiveOptions]="{ exact: true }"
+                    (click)="collapseNavbar()"
+                  >
+                    <fa-icon icon="file-medical" [fixedWidth]="true"></fa-icon>
+                    <span jhiTranslate="global.menu.entities.historiaClinica">Historia Clínica</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    routerLink="/horario-atencion"
+                    routerLinkActive="active"
+                    [routerLinkActiveOptions]="{ exact: true }"
+                    (click)="collapseNavbar()"
+                  >
+                    <fa-icon icon="clock" [fixedWidth]="true"></fa-icon>
+                    <span jhiTranslate="global.menu.entities.horarioAtencion">Horarios</span>
+                  </a>
+                </li>
+              </ul>
+            </li>
+          }
         }
         <li
           *jhiHasAnyAuthority="'ROLE_ADMIN'"
@@ -302,6 +362,35 @@
             }
           </ul>
         </li>
+        <!-- Seccion nueva de paciente -->
+        @if (account() && account()?.authorities && account()?.authorities?.includes('ROLE_PACIENTE')) {
+          <li class="nav-item dropdown" ngbDropdown display="dynamic" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            <a class="nav-link dropdown-toggle" ngbDropdownToggle href="javascript:void(0);" id="entity-menu" data-cy="entity">
+              <span>
+                <fa-icon icon="th-list" />
+                <span>Mis Citas</span>
+              </span>
+            </a>
+            <ul class="dropdown-menu" ngbDropdownMenu aria-labelledby="entity-menu">
+              <li>
+                <a
+                  class="dropdown-item"
+                  routerLink="/cita"
+                  routerLinkActive="active"
+                  [routerLinkActiveOptions]="{ exact: true }"
+                  (click)="collapseNavbar()"
+                >
+                  <fa-icon icon="eye" />&nbsp;<span>Ver Mis Citas</span>
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" routerLink="/cita/paciente/new" routerLinkActive="active" (click)="collapseNavbar()">
+                  <fa-icon icon="plus" />&nbsp;<span>Solicitar Nueva Cita</span>
+                </a>
+              </li>
+            </ul>
+          </li>
+        }
       </ul>
     </div>
   </div>

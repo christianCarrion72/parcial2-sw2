@@ -1,6 +1,7 @@
 package com.parcial2.consul.service;
 
 import com.parcial2.consul.domain.Cita;
+import com.parcial2.consul.domain.enumeration.EstadoCita;
 import com.parcial2.consul.repository.CitaRepository;
 import com.parcial2.consul.service.dto.CitaDTO;
 import com.parcial2.consul.service.mapper.CitaMapper;
@@ -117,5 +118,75 @@ public class CitaService {
     public void delete(Long id) {
         LOG.debug("Request to delete Cita : {}", id);
         citaRepository.deleteById(id);
+    }
+
+    // Nuevos métodos para pacientes
+
+    /**
+     * Get all citas for a specific patient.
+     *
+     * @param pacienteId the patient ID to filter by.
+     * @param pageable the pagination information.
+     * @return the list of entities.
+     */
+    @Transactional(readOnly = true)
+    public Page<CitaDTO> findByPacienteId(Long pacienteId, Pageable pageable) {
+        LOG.debug("Request to get all Citas for patient: {}", pacienteId);
+        return citaRepository.findByPacienteId(pacienteId, pageable).map(citaMapper::toDto);
+    }
+
+    /**
+     * Get all citas for a specific patient with eager relationships.
+     *
+     * @param pacienteId the patient ID to filter by.
+     * @param pageable the pagination information.
+     * @return the list of entities.
+     */
+    @Transactional(readOnly = true)
+    public Page<CitaDTO> findByPacienteIdWithEagerRelationships(Long pacienteId, Pageable pageable) {
+        LOG.debug("Request to get all Citas with eager relationships for patient: {}", pacienteId);
+        return citaRepository.findByPacienteIdWithEagerRelationships(pacienteId, pageable).map(citaMapper::toDto);
+    }
+
+    /**
+     * Get one cita by id for a specific patient.
+     *
+     * @param id the cita id
+     * @param pacienteId the patient id
+     * @return the entity
+     */
+    @Transactional(readOnly = true)
+    public Optional<CitaDTO> findOneByPacienteId(Long id, Long pacienteId) {
+        LOG.debug("Request to get Cita : {} for patient : {}", id, pacienteId);
+        return citaRepository.findByIdAndPacienteIdWithEagerRelationships(id, pacienteId).map(citaMapper::toDto);
+    }
+
+    /**
+     * Partially update a cita for a patient (only estado allowed).
+     *
+     * @param citaDTO the entity to update partially
+     * @param pacienteId the patient id
+     * @return the persisted entity
+     */
+    public Optional<CitaDTO> partialUpdateForPaciente(CitaDTO citaDTO, Long pacienteId) {
+        LOG.debug("Request to partially update Cita : {} for patient : {}", citaDTO, pacienteId);
+
+        return citaRepository
+            .findByIdAndPacienteIdWithEagerRelationships(citaDTO.getId(), pacienteId)
+            .map(existingCita -> {
+                // Solo permitir cambio de estado para pacientes
+                if (citaDTO.getEstado() != null) {
+                    // Solo permitir CONFIRMADA o CANCELADA
+                    if (citaDTO.getEstado() == EstadoCita.CONFIRMADA || citaDTO.getEstado() == EstadoCita.CANCELADA) {
+                        existingCita.setEstado(citaDTO.getEstado());
+                        if (citaDTO.getEstado() == EstadoCita.CONFIRMADA) {
+                            existingCita.setConfirmada(true);
+                        }
+                    }
+                }
+                return existingCita;
+            })
+            .map(citaRepository::save)
+            .map(citaMapper::toDto);
     }
 }

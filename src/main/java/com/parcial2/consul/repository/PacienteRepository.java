@@ -37,4 +37,8 @@ public interface PacienteRepository extends JpaRepository<Paciente, Long> {
 
     @Query("select paciente from Paciente paciente left join fetch paciente.user where paciente.id =:id")
     Optional<Paciente> findOneWithToOneRelationships(@Param("id") Long id);
+
+    // En PacienteRepository.java
+    @Query("select p from Paciente p where p.user.login = :login")
+    Optional<Paciente> findByUserLogin(@Param("login") String login);
 }

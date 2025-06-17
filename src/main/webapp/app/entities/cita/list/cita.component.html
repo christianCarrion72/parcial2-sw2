@@ -8,15 +8,18 @@
         <span jhiTranslate="parcial2Sw2MApp.cita.home.refreshListLabel">Refrescar lista</span>
       </button>
 
-      <button
-        id="jh-create-entity"
-        data-cy="entityCreateButton"
-        class="btn btn-primary jh-create-entity create-cita"
-        [routerLink]="['/cita/new']"
-      >
-        <fa-icon icon="plus"></fa-icon>
-        <span jhiTranslate="parcial2Sw2MApp.cita.home.createLabel">Crear nuevo Cita</span>
-      </button>
+      <!-- Solo mostrar el botón de crear para no-pacientes -->
+      @if (!isPaciente()) {
+        <button
+          id="jh-create-entity"
+          data-cy="entityCreateButton"
+          class="btn btn-primary jh-create-entity create-cita"
+          [routerLink]="['/cita/new']"
+        >
+          <fa-icon icon="plus"></fa-icon>
+          <span jhiTranslate="parcial2Sw2MApp.cita.home.createLabel">Crear nuevo Cita</span>
+        </button>
+      }
     </div>
   </h2>
 
@@ -125,15 +128,18 @@
                     <span class="d-none d-md-inline" jhiTranslate="entity.action.view">Vista</span>
                   </a>
 
-                  <a [routerLink]="['/cita', cita.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
-                    <fa-icon icon="pencil-alt"></fa-icon>
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Editar</span>
-                  </a>
+                  <!-- Solo mostrar botones de editar/eliminar para no-pacientes -->
+                  @if (!isPaciente()) {
+                    <a [routerLink]="['/cita', cita.id, 'edit']" class="btn btn-primary btn-sm" data-cy="entityEditButton">
+                      <fa-icon icon="pencil-alt"></fa-icon>
+                      <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Editar</span>
+                    </a>
 
-                  <button type="submit" (click)="delete(cita)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
-                    <fa-icon icon="times"></fa-icon>
-                    <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Eliminar</span>
-                  </button>
+                    <button type="submit" (click)="delete(cita)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                      <fa-icon icon="times"></fa-icon>
+                      <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Eliminar</span>
+                    </button>
+                  }
                 </div>
               </td>
             </tr>

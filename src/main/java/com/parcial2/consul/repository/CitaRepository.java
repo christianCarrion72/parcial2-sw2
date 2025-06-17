@@ -37,4 +37,22 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
 
     @Query("select cita from Cita cita left join fetch cita.paciente left join fetch cita.medico where cita.id =:id")
     Optional<Cita> findOneWithToOneRelationships(@Param("id") Long id);
+
+    // Nuevos métodos para filtrar por paciente
+    @Query(
+        value = "select cita from Cita cita left join fetch cita.paciente left join fetch cita.medico where cita.paciente.id = :pacienteId",
+        countQuery = "select count(cita) from Cita cita where cita.paciente.id = :pacienteId"
+    )
+    Page<Cita> findByPacienteId(@Param("pacienteId") Long pacienteId, Pageable pageable);
+
+    @Query(
+        value = "select cita from Cita cita left join fetch cita.paciente left join fetch cita.medico left join fetch cita.horario where cita.paciente.id = :pacienteId",
+        countQuery = "select count(cita) from Cita cita where cita.paciente.id = :pacienteId"
+    )
+    Page<Cita> findByPacienteIdWithEagerRelationships(@Param("pacienteId") Long pacienteId, Pageable pageable);
+
+    @Query(
+        "select cita from Cita cita left join fetch cita.paciente left join fetch cita.medico where cita.paciente.id = :pacienteId and cita.id = :id"
+    )
+    Optional<Cita> findByIdAndPacienteIdWithEagerRelationships(@Param("id") Long id, @Param("pacienteId") Long pacienteId);
 }

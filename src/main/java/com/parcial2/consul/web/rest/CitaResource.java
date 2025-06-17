@@ -1,6 +1,7 @@
 package com.parcial2.consul.web.rest;
 
 import com.parcial2.consul.repository.CitaRepository;
+import com.parcial2.consul.repository.PacienteRepository;
 import com.parcial2.consul.service.CitaService;
 import com.parcial2.consul.service.dto.CitaDTO;
 import com.parcial2.consul.web.rest.errors.BadRequestAlertException;
@@ -18,6 +19,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tech.jhipster.web.util.HeaderUtil;
@@ -42,9 +45,12 @@ public class CitaResource {
 
     private final CitaRepository citaRepository;
 
-    public CitaResource(CitaService citaService, CitaRepository citaRepository) {
+    private final PacienteRepository pacienteRepository;
+
+    public CitaResource(CitaService citaService, CitaRepository citaRepository, PacienteRepository pacienteRepository) {
         this.citaService = citaService;
         this.citaRepository = citaRepository;
+        this.pacienteRepository = pacienteRepository;
     }
 
     /**
@@ -55,11 +61,27 @@ public class CitaResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
-    public ResponseEntity<CitaDTO> createCita(@Valid @RequestBody CitaDTO citaDTO) throws URISyntaxException {
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_MEDICO') or hasRole('ROLE_PACIENTE')")
+    public ResponseEntity<CitaDTO> createCita(@Valid @RequestBody CitaDTO citaDTO, Authentication authentication)
+        throws URISyntaxException {
         LOG.debug("REST request to save Cita : {}", citaDTO);
         if (citaDTO.getId() != null) {
             throw new BadRequestAlertException("A new cita cannot already have an ID", ENTITY_NAME, "idexists");
         }
+
+        // Si es paciente, verificar que la cita sea para él
+        if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_PACIENTE"))) {
+            String currentUserLogin = authentication.getName();
+            Long pacienteId = pacienteRepository
+                .findByUserLogin(currentUserLogin)
+                .map(paciente -> paciente.getId())
+                .orElseThrow(() -> new BadRequestAlertException("Paciente not found for current user", ENTITY_NAME, "pacientenotfound"));
+
+            if (!Objects.equals(citaDTO.getPaciente().getId(), pacienteId)) {
+                throw new BadRequestAlertException("Patients can only create appointments for themselves", ENTITY_NAME, "unauthorized");
+            }
+        }
+
         citaDTO = citaService.save(citaDTO);
         return ResponseEntity.created(new URI("/api/citas/" + citaDTO.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, citaDTO.getId().toString()))
@@ -77,6 +99,7 @@ public class CitaResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_MEDICO')")
     public ResponseEntity<CitaDTO> updateCita(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody CitaDTO citaDTO
@@ -111,9 +134,11 @@ public class CitaResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_MEDICO') or hasRole('ROLE_PACIENTE')")
     public ResponseEntity<CitaDTO> partialUpdateCita(
         @PathVariable(value = "id", required = false) final Long id,
-        @NotNull @RequestBody CitaDTO citaDTO
+        @NotNull @RequestBody CitaDTO citaDTO,
+        Authentication authentication
     ) throws URISyntaxException {
         LOG.debug("REST request to partial update Cita partially : {}, {}", id, citaDTO);
         if (citaDTO.getId() == null) {
@@ -127,7 +152,20 @@ public class CitaResource {
             throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
         }
 
-        Optional<CitaDTO> result = citaService.partialUpdate(citaDTO);
+        Optional<CitaDTO> result;
+
+        // Si es paciente, usar método restringido
+        if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_PACIENTE"))) {
+            String currentUserLogin = authentication.getName();
+            Long pacienteId = pacienteRepository
+                .findByUserLogin(currentUserLogin)
+                .map(paciente -> paciente.getId())
+                .orElseThrow(() -> new BadRequestAlertException("Paciente not found for current user", ENTITY_NAME, "pacientenotfound"));
+
+            result = citaService.partialUpdateForPaciente(citaDTO, pacienteId);
+        } else {
+            result = citaService.partialUpdate(citaDTO);
+        }
 
         return ResponseUtil.wrapOrNotFound(
             result,
@@ -143,17 +181,32 @@ public class CitaResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of citas in body.
      */
     @GetMapping("")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_MEDICO') or hasRole('ROLE_PACIENTE')")
     public ResponseEntity<List<CitaDTO>> getAllCitas(
         @org.springdoc.core.annotations.ParameterObject Pageable pageable,
-        @RequestParam(name = "eagerload", required = false, defaultValue = "true") boolean eagerload
+        @RequestParam(name = "eagerload", required = false, defaultValue = "true") boolean eagerload,
+        Authentication authentication
     ) {
         LOG.debug("REST request to get a page of Citas");
         Page<CitaDTO> page;
-        if (eagerload) {
-            page = citaService.findAllWithEagerRelationships(pageable);
+
+        // Si es paciente, solo mostrar sus citas
+        if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_PACIENTE"))) {
+            String currentUserLogin = authentication.getName();
+            Long pacienteId = pacienteRepository
+                .findByUserLogin(currentUserLogin)
+                .map(paciente -> paciente.getId())
+                .orElseThrow(() -> new BadRequestAlertException("Paciente not found for current user", ENTITY_NAME, "pacientenotfound"));
+
+            page = citaService.findByPacienteId(pacienteId, pageable);
         } else {
-            page = citaService.findAll(pageable);
+            if (eagerload) {
+                page = citaService.findAllWithEagerRelationships(pageable);
+            } else {
+                page = citaService.findAll(pageable);
+            }
         }
+
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
@@ -165,9 +218,25 @@ public class CitaResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the citaDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<CitaDTO> getCita(@PathVariable("id") Long id) {
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_MEDICO') or hasRole('ROLE_PACIENTE')")
+    public ResponseEntity<CitaDTO> getCita(@PathVariable("id") Long id, Authentication authentication) {
         LOG.debug("REST request to get Cita : {}", id);
-        Optional<CitaDTO> citaDTO = citaService.findOne(id);
+
+        Optional<CitaDTO> citaDTO;
+
+        // Si es paciente, verificar que la cita le pertenezca
+        if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_PACIENTE"))) {
+            String currentUserLogin = authentication.getName();
+            Long pacienteId = pacienteRepository
+                .findByUserLogin(currentUserLogin)
+                .map(paciente -> paciente.getId())
+                .orElseThrow(() -> new BadRequestAlertException("Paciente not found for current user", ENTITY_NAME, "pacientenotfound"));
+
+            citaDTO = citaService.findOneByPacienteId(id, pacienteId);
+        } else {
+            citaDTO = citaService.findOne(id);
+        }
+
         return ResponseUtil.wrapOrNotFound(citaDTO);
     }
 
@@ -178,6 +247,7 @@ public class CitaResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_MEDICO')")
     public ResponseEntity<Void> deleteCita(@PathVariable("id") Long id) {
         LOG.debug("REST request to delete Cita : {}", id);
         citaService.delete(id);

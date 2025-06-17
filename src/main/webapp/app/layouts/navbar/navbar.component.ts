@@ -72,4 +72,9 @@ export default class NavbarComponent implements OnInit {
   toggleNavbar(): void {
     this.isNavbarCollapsed.update(isNavbarCollapsed => !isNavbarCollapsed);
   }
+
+  navigateToCitas(): void {
+    this.collapseNavbar();
+    this.router.navigate(['/cita']);
+  }
 }

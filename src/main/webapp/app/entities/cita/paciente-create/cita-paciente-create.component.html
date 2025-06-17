@@ -1,0 +1,141 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <form name="editForm" novalidate (ngSubmit)="save()" [formGroup]="editForm">
+      <h2 id="jhi-cita-heading" data-cy="CitaPacienteCreateHeading">Solicitar Nueva Cita Médica</h2>
+
+      <div>
+        <jhi-alert-error />
+
+        <!-- Información del paciente (solo lectura) -->
+        @if (pacienteActual) {
+          <div class="mb-3">
+            <label class="form-label">Paciente</label>
+            <input
+              type="text"
+              class="form-control"
+              [value]="pacienteActual.nroHistoriaClinica"
+              readonly
+              style="background-color: #f8f9fa"
+            />
+            <small class="form-text text-muted">Esta cita será creada para su historia clínica</small>
+          </div>
+        }
+
+        <!-- Selector de Especialidad -->
+        @let especialidadRef = editForm.get('especialidad')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_especialidad">Especialidad *</label>
+          <select
+            class="form-control"
+            id="field_especialidad"
+            name="especialidad"
+            formControlName="especialidad"
+            [compareWith]="compareEspecialidad"
+          >
+            <option [ngValue]="null">Seleccione una especialidad</option>
+            @for (especialidad of especialidades; track $index) {
+              <option [ngValue]="especialidad">{{ especialidad.nombre }}</option>
+            }
+          </select>
+          @if (especialidadRef.invalid && (especialidadRef.dirty || especialidadRef.touched)) {
+            <div>
+              @if (editForm.get('especialidad')?.errors?.required) {
+                <small class="form-text text-danger">Debe seleccionar una especialidad.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Selector de Médico -->
+        @let medicoRef = editForm.get('medico')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_medico">Médico *</label>
+          <select
+            class="form-control"
+            id="field_medico"
+            name="medico"
+            formControlName="medico"
+            [compareWith]="compareMedico"
+            [disabled]="medicosDisponibles.length === 0"
+          >
+            <option [ngValue]="null">
+              @if (medicosDisponibles.length === 0) {
+                Primero seleccione una especialidad
+              } @else {
+                Seleccione un médico
+              }
+            </option>
+            @for (medico of medicosDisponibles; track $index) {
+              <option [ngValue]="medico">Dr. {{ medico.user?.login }} - Matrícula: {{ medico.matricula }}</option>
+            }
+          </select>
+          @if (medicoRef.invalid && (medicoRef.dirty || medicoRef.touched)) {
+            <div>
+              @if (editForm.get('medico')?.errors?.required) {
+                <small class="form-text text-danger">Debe seleccionar un médico.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Selector de Horario -->
+        @let horarioRef = editForm.get('horario')!;
+        <div class="mb-3">
+          <label class="form-label" for="field_horario">Horario Disponible *</label>
+          <select
+            class="form-control"
+            id="field_horario"
+            name="horario"
+            formControlName="horario"
+            [compareWith]="compareHorarioAtencion"
+            [disabled]="horariosDisponibles.length === 0"
+          >
+            <option [ngValue]="null">
+              @if (horariosDisponibles.length === 0) {
+                Primero seleccione un médico
+              } @else {
+                Seleccione un horario
+              }
+            </option>
+            @for (horario of horariosDisponibles; track $index) {
+              <option [ngValue]="horario">{{ horario.diaSemana }} - {{ horario.horaInicio }} a {{ horario.horaFin }}</option>
+            }
+          </select>
+          @if (horarioRef.invalid && (horarioRef.dirty || horarioRef.touched)) {
+            <div>
+              @if (editForm.get('horario')?.errors?.required) {
+                <small class="form-text text-danger">Debe seleccionar un horario.</small>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Información adicional -->
+        <div class="alert alert-info">
+          <h6>Información de la cita:</h6>
+          <ul class="mb-0">
+            <li><strong>Estado:</strong> La cita se creará como "Programada"</li>
+            <li><strong>Fecha:</strong> Se asignará la fecha actual</li>
+            <li><strong>Confirmación:</strong> Pendiente de confirmación por el médico</li>
+          </ul>
+        </div>
+      </div>
+
+      <div>
+        <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" (click)="previousState()">
+          <fa-icon icon="ban" />&nbsp;<span>Cancelar</span>
+        </button>
+
+        <button
+          type="submit"
+          id="save-entity"
+          data-cy="entityCreateSaveButton"
+          [disabled]="editForm.invalid || isSaving"
+          class="btn btn-primary"
+        >
+          <fa-icon icon="save" />&nbsp;<span>Solicitar Cita</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

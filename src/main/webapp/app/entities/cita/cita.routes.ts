@@ -37,6 +37,13 @@ const citaRoute: Routes = [
     },
     canActivate: [UserRouteAccessService],
   },
+  {
+    path: 'paciente/new',
+    loadComponent: () => import('./paciente-create/cita-paciente-create.component').then(m => m.CitaPacienteCreateComponent),
+    resolve: {
+      cita: () => null,
+    },
+  },
 ];
 
 export default citaRoute;

@@ -5,6 +5,7 @@ import com.parcial2.consul.repository.CitaRepository;
 import com.parcial2.consul.repository.HorarioAtencionRepository;
 import com.parcial2.consul.repository.MedicoRepository;
 import com.parcial2.consul.repository.PacienteRepository;
+import com.parcial2.consul.security.SecurityUtils;
 import com.parcial2.consul.service.CitaService;
 import com.parcial2.consul.service.HorarioAtencionService;
 import com.parcial2.consul.service.MedicoService;
@@ -17,6 +18,7 @@ import com.parcial2.consul.web.rest.errors.BadRequestAlertException;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -90,10 +92,36 @@ public class CitaGraphQLController {
         }
 
         Page<CitaDTO> citaPage;
-        if (eager) {
-            citaPage = citaService.findAllWithEagerRelationships(pageRequest);
+
+        // Verificar si el usuario actual es un paciente
+        if (SecurityUtils.hasCurrentUserThisAuthority("ROLE_PACIENTE")) {
+            // Si es paciente, filtrar solo sus citas
+            Optional<String> currentUserLogin = SecurityUtils.getCurrentUserLogin();
+            if (currentUserLogin.isPresent()) {
+                Optional<Long> pacienteIdOpt = pacienteRepository.findByUserLogin(currentUserLogin.get()).map(paciente -> paciente.getId());
+
+                if (pacienteIdOpt.isPresent()) {
+                    Long pacienteId = pacienteIdOpt.get();
+                    log.debug("Filtering citas for patient ID: {}", pacienteId);
+
+                    if (eager) {
+                        citaPage = citaService.findByPacienteIdWithEagerRelationships(pacienteId, pageRequest);
+                    } else {
+                        citaPage = citaService.findByPacienteId(pacienteId, pageRequest);
+                    }
+                } else {
+                    throw new BadRequestAlertException("Paciente no encontrado para el usuario actual", "cita", "pacienteNotFound");
+                }
+            } else {
+                throw new BadRequestAlertException("Usuario no autenticado", "cita", "userNotAuthenticated");
+            }
         } else {
-            citaPage = citaService.findAll(pageRequest);
+            // Si no es paciente (admin o médico), mostrar todas las citas
+            if (eager) {
+                citaPage = citaService.findAllWithEagerRelationships(pageRequest);
+            } else {
+                citaPage = citaService.findAll(pageRequest);
+            }
         }
 
         return citaPage.getContent();

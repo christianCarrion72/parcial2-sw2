@@ -1,4 +1,4 @@
-import { Component, NgZone, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, NgZone, signal } from '@angular/core';
 import { HttpHeaders } from '@angular/common/http';
 import { ActivatedRoute, Data, ParamMap, Router, RouterModule } from '@angular/router';
 import { Observable, Subscription, combineLatest, filter, tap } from 'rxjs';
@@ -9,6 +9,7 @@ import { SortByDirective, SortDirective, SortService, type SortState, sortStateS
 import { FormatMediumDatetimePipe } from 'app/shared/date';
 import { ItemCountComponent } from 'app/shared/pagination';
 import { FormsModule } from '@angular/forms';
+import { AccountService } from 'app/core/auth/account.service';
 
 import { ITEMS_PER_PAGE, PAGE_HEADER, TOTAL_COUNT_RESPONSE_HEADER } from 'app/config/pagination.constants';
 import { DEFAULT_SORT_DATA, ITEM_DELETED_EVENT, SORT } from 'app/config/navigation.constants';
@@ -40,8 +41,14 @@ export class CitaComponent implements OnInit {
   protected modalService = inject(NgbModal);
   protected ngZone = inject(NgZone);
   protected readonly citaGraphQLService = inject(CitaGraphQLService);
+  protected readonly accountService = inject(AccountService);
 
   trackId = (item: ICita): number => this.citaService.getCitaIdentifier(item);
+
+  // Método para verificar si el usuario es paciente
+  isPaciente(): boolean {
+    return this.accountService.hasAnyAuthority('ROLE_PACIENTE');
+  }
 
   ngOnInit(): void {
     this.subscription = combineLatest([this.activatedRoute.queryParamMap, this.activatedRoute.data])
